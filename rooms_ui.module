@@ -1,0 +1,187 @@
+<?php
+
+/**
+ * @file
+ * Interface support to the Rooms family of modules.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function rooms_ui_menu() {
+  $items = array();
+
+  // Top level "Rooms" container.
+  $items['admin/rooms'] = array(
+    'title' => 'Rooms',
+    'description' => t('Administer Rooms.'),
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+    'weight' => -7,
+  );
+  $items['admin/rooms/config'] = array(
+    'title' => t('Configuration'),
+    'description' => t('Configure settings and business rules for Rooms management.'),
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('configure room settings'),
+    'type' => MENU_NORMAL_ITEM,
+    'weight' => 10,
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+  $items['admin/rooms/config/bookings'] = array(
+    'title' => t('Booking Settings'),
+    'description' => t('Configure settings and business rules for Bookings.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('rooms_booking_settings'),
+    'access arguments' => array('configure room settings'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Yani: add price/ menu setting menu - form
+  $items['admin/rooms/config/camping'] = array(
+    'title' => t('Camping search bar menu and price settings'),
+    'description' => t('Configure price and menu links for the camping place.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('camping_price_settings'),
+    'access arguments' => array('configure room settings'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+
+function rooms_booking_settings() {
+  $form = array();
+  $form['rooms_booking_settings']['rooms_booking_start_date'] = array(
+    '#type' => 'select',
+    '#title' => t('How soon a booking can start'),
+    '#options' => array(
+      '0' => t('Same day bookings'),
+      '1' => t('1 day in advance'),
+      '2' => t('2 days in advance'),
+      '3' => t('3 days in advance'),
+      '4' => t('4 days in advance'),
+      '5' => t('5 days in advance'),
+      '6' => t('6 days in advance'),
+      '7' => t('7 days in advance'),
+    ),
+    '#default_value' => variable_get('rooms_booking_start_date', 1),
+  );
+
+  return system_settings_form($form);
+}
+
+// Yani : add setting page for price
+function camping_price_settings() {
+  $form = array();
+  $form['vertical_settings_tab'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 0,
+  );
+  // Form element. It's a fieldset , "Menu link to type"
+  $form['camping_settings'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Camping menu'),
+    '#collapsible' => TRUE,
+    '#group' => 'vertical_settings_tab',
+  );
+  $menu_option = array();
+  $existing_menu = db_query("SELECT * FROM {menu_links} where menu_name = 'menu-camping-menu'");
+  if ($existing_menu) {
+    foreach ($existing_menu as $menu_item) {
+      //$menu_name = $menu_item->menu_name;
+      $menu_title = strtolower($menu_item->link_title);
+      $menu_option[$menu_title] = $menu_title;
+        $form['camping_settings']["camping_setting_menu_links_$menu_title"] = array(
+          '#type' => 'textfield',
+          '#title' => t("menu link -'$menu_title'"),
+          '#description' => t("Go to admin/rooms/units/unit-types to find the machine name of the type."),
+          '#default_value' => variable_get("camping_setting_menu_links_$menu_title", ''),
+        );
+    }
+  }
+  // Form element. It's a fieldset , "tent price"
+  $form['camping_settings_1'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Camping tent price'),
+    '#collapsible' => TRUE,
+    '#group' => 'vertical_settings_tab',
+  );
+  $form['camping_settings_1']["camping_setting_price_adults"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Price for adults per night"),
+    '#description' => t("e.g. 69"),
+    '#default_value' => variable_get('camping_setting_price_adults', '69'),
+  );
+  $form['camping_settings_1']["camping_setting_price_children"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Price for children per night"),
+    '#description' => t("e.g 39"),
+    '#default_value' => variable_get('camping_setting_price_children', '39'),
+  );
+
+    // Form element. It's a fieldset , "cabins price"
+  $form['camping_settings_2'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Camping cabins price'),
+    '#collapsible' => TRUE,
+    '#group' => 'vertical_settings_tab',
+  );
+  $form['camping_settings_2']["camping_setting_price_cabins_name"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins name in bookable unit type"),
+    '#description' => t("e.g. hytter"),
+    '#default_value' => variable_get('camping_setting_price_cabins_name', 'hytter'),
+  );
+   $form['camping_settings_2']['low'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Camping cabins low season'),
+    '#collapsible' => FALSE,
+  );
+  $form['camping_settings_2']['low']["camping_setting_price_cabins_day"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins Low Season day price"),
+    '#description' => t("e.g. 475"),
+    '#default_value' => variable_get('camping_setting_price_cabins_day', 475),
+  );
+  $form['camping_settings_2']['low']["camping_setting_price_cabins_4"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins price for 4 days"),
+    '#description' => t("e.g. 1695"),
+    '#default_value' => variable_get('camping_setting_price_cabins_4', ''),
+  );
+  $form['camping_settings_2']['low']["camping_setting_price_cabins_7"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins price for one week"),
+    '#description' => t("e.g 2775"),
+    '#default_value' => variable_get('camping_setting_price_cabins_7', ''),
+  );
+     $form['camping_settings_2']['high'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Camping cabins high season'),
+    '#collapsible' => FALSE,
+  );
+    $form['camping_settings_2']['high']["camping_setting_price_cabins_day_high"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins High Season day price"),
+    '#description' => t("e.g. 549"),
+    '#default_value' => variable_get('camping_setting_price_cabins_day_high', 549),
+  );
+
+  $form['camping_settings_2']['high']["camping_setting_price_cabins_4_high"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins price for 4 days"),
+    '#description' => t("e.g. 1995"),
+    '#default_value' => variable_get('camping_setting_price_cabins_4_high', 549*4),
+  );
+  $form['camping_settings_2']['high']["camping_setting_price_cabins_7_high"] = array(
+    '#type' => 'textfield',
+    '#title' => t("Cabins price for one week"),
+    '#description' => t("e.g 3275"),
+    '#default_value' => variable_get('camping_setting_price_cabins_7_high', 549*7),
+  );
+  return system_settings_form($form);
+}
