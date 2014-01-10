@@ -151,13 +151,13 @@ function camping_price_settings() {
     '#type' => 'textfield',
     '#title' => t("Cabins price for 4 days"),
     '#description' => t("e.g. 1695"),
-    '#default_value' => variable_get('camping_setting_price_cabins_4', ''),
+    '#default_value' => variable_get('camping_setting_price_cabins_4', '1695'),
   );
   $form['camping_settings_2']['low']["camping_setting_price_cabins_7"] = array(
     '#type' => 'textfield',
     '#title' => t("Cabins price for one week"),
     '#description' => t("e.g 2775"),
-    '#default_value' => variable_get('camping_setting_price_cabins_7', ''),
+    '#default_value' => variable_get('camping_setting_price_cabins_7', '2775'),
   );
      $form['camping_settings_2']['high'] = array(
     '#type' => 'fieldset',
@@ -175,13 +175,13 @@ function camping_price_settings() {
     '#type' => 'textfield',
     '#title' => t("Cabins price for 4 days"),
     '#description' => t("e.g. 1995"),
-    '#default_value' => variable_get('camping_setting_price_cabins_4_high', 549*4),
+    '#default_value' => variable_get('camping_setting_price_cabins_4_high', 1995),
   );
   $form['camping_settings_2']['high']["camping_setting_price_cabins_7_high"] = array(
     '#type' => 'textfield',
     '#title' => t("Cabins price for one week"),
     '#description' => t("e.g 3275"),
-    '#default_value' => variable_get('camping_setting_price_cabins_7_high', 549*7),
+    '#default_value' => variable_get('camping_setting_price_cabins_7_high', 3275),
   );
   return system_settings_form($form);
 }
