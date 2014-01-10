@@ -368,7 +368,13 @@ function rooms_unit_edit_form_submit(&$form, &$form_state) {
       $units[$i] = rooms_unit_create(array('type' => $form_state['rooms_unit']->type));
       $form_state['rooms_unit'] = $units[$i];
       if ($i>1) {
-        $form_state['values']['name'] = $name . ' - ' . $i;
+        // Yani: fix name accounting when it is a number.
+        if (is_numeric($name)) {
+          $form_state['values']['name']  = $name + ($i-1);
+        }
+        else {
+          $form_state['values']['name'] = $name . ' - ' . $i; 
+        }
       }
 
       $units[$i] = entity_ui_controller('rooms_unit')->entityFormSubmitBuildEntity($form, $form_state);

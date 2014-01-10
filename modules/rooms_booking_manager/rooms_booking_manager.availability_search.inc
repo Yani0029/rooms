@@ -127,7 +127,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
   elseif (variable_get('rooms_presentation_style', ROOMS_PER_TYPE) == ROOMS_INDIVIDUAL) {
     $form['rooms_fieldset']['group_size_adults:1'] = array(
       '#type' => 'select',
-      '#title' => t('Antal adults'),
+      '#title' => t('Voksne'),
       '#options' => array(
         '1' => '1',
         '2' => '2',
