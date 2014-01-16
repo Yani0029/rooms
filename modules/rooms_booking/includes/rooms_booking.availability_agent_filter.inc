@@ -75,7 +75,9 @@ class AvailabilityAgentSizeFilter extends AvailabilityAgentCommonFilter {
 
     // Add a unit type condition if this has been defined
     if ($unit_types != NULL) {
-      $query->propertyCondition('type', $unit_types[0]);
+      // Yani: change one type to two types.
+      //$query->propertyCondition('type', $unit_types[0]);
+        $query->propertyCondition('type', $unit_types, 'IN');
     }
 
     // Execute the query and collect the results

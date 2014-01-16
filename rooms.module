@@ -118,7 +118,7 @@ function rooms_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     $element['quantity'] = array(
       '#type' => 'select',
       '#title' => t('Quantity'),
-      '#options' => array('None', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'),
+      '#options' => array('None', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10','11','12','13','14','15','16','17','18','19','20'),
       '#default_value' => isset($items[$delta]['quantity']) ? $items[$delta]['quantity'] : NULL,
       '#description' => 'How many of this option should be available',
     );

@@ -181,6 +181,13 @@ function rooms_booking_manager_results_page(DateTime $start_date, DateTime $end_
       if (rooms_unit_type_load($type) !== FALSE) {
         $unit_types[] = $type;
       }
+      // Yani: TODO if type is hytter, so hytter_2 is also included.
+      $hytter_type = variable_get('camping_setting_price_cabins_name', 'hytter');
+      if ($type == $hytter_type) {
+        $hytter_2 = variable_get('camping2_setting_price_cabins_name', 'hytter_2');
+        if (rooms_unit_type_load($hytter_2) != FALSE)
+          $unit_types[] = $hytter_2;
+      }
     }
 
     // Get all the units - note: we instantiate the Availability Agent using the date format set by the user
@@ -456,6 +463,11 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   $low_dayprice = variable_get('camping_setting_price_cabins_day', 475);
   $hight_dayprice = variable_get('camping_setting_price_cabins_day_hight', 549);
 
+  $hytter_2 = variable_get('camping2_setting_price_cabins_name','hytter_2');
+  // Yani: add low season and high season price for cabins.
+  $low_dayprice2 = variable_get('camping2_setting_price_cabins_day', 295);
+  $hight_dayprice2 = variable_get('camping2_setting_price_cabins_day_hight', 395);
+
   // Yani: add 4 days and week price for cabins.
   if ($nights >= 4 && $nights < 7 && $unit->type == $hytter) {
     $day_price = $price/$nights;
@@ -490,8 +502,43 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $price = number_format($oneweek * $nights,2);
    }
 
-  // Yani: Adults and children price for cabins type.
-  if ($unit->type != $hytter) {
+  // Yani: 4 days and week price for cabins. Hytter_2 Category 2
+  if ($nights >= 4 && $nights < 7 && $unit->type == $hytter_2) {
+    $day_price = $price/$nights;
+    $fourdays_new2 = 0;
+    if ($day_price == $low_dayprice2) {
+      $fourdays_new2 = variable_get('camping2_setting_price_cabins_4',$day_price);
+    }
+    elseif ($day_price == $hight_dayprice2) {
+      $fourdays_new2 = variable_get('camping2_setting_price_cabins_4_high',$day_price);
+    }
+    else $fourdays_new2 =$price;
+
+    $fourdays_new2 = $fourdays_new2/4;
+    // Yani: discount price is lower than calculated price (per day)
+    if ($day_price >= $fourdays_new2)
+      $price = number_format($fourdays_new2 * $nights,2);
+  }
+  // Yani: Week price.
+  elseif ($nights >= 7 && $unit->type == $hytter_2) {
+    $day_price = $price/$nights;
+    $oneweek2 = 0;
+    // Yani: TODO it could be a combination price of low and high season.
+    if ($day_price >= $low_dayprice2 && $day_price < $hight_dayprice2) {
+      $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price);
+    }
+    elseif ($day_price == $hight_dayprice2) {
+      $oneweek2 = variable_get('camping2_setting_price_cabins_7_high',$day_price);
+    }
+
+    $oneweek2 = $oneweek2/7;
+    if ($day_price >= $oneweek2)
+      $price = number_format($oneweek2 * $nights,2);
+   }
+
+
+  // Yani: Adults and children price for other types.
+  if ($unit->type != $hytter && $unit->type != $hytter_2) {
     $price = $price + $adults_price * $group_size_adults * $nights + $children_price * $group_size_children * $nights;
   }
 
@@ -511,8 +558,10 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   if (isset($unit->rooms_booking_unit_options[LANGUAGE_NONE])) {
     // Convert Price options in Price modifiers
     $price_modifiers = array();
+    $add_price = 0;
 
     foreach ($unit->rooms_booking_unit_options[LANGUAGE_NONE] as $option) {
+     // print_r($option);
       $form['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
         '#type' => 'checkbox',
         '#title' => $option['name'],
@@ -561,11 +610,15 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         }
 
         if ($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1) {
+          // Yani: debug option price.
+       //   $quantity = $form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'];
           $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
             '#type' => ROOMS_DYNAMIC_MODIFIER,
             '#op_type' => $option['operation'],
             '#amount' => $option['value'] * $quantity,
+            '#quantity' =>$quantity,
           );
+          $add_price = $add_price +  $option['value'] * $quantity;
         }
       }
     }
@@ -679,7 +732,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
 
     $form['new_price'] = array(
       '#prefix' => '<div id="unit_' . $unit->unit_id . '_price" style="font-weight:bold">',
-      '#markup' => t('Cost:') . ' ' . $currency_symbol . ' ' . $new_price['full_price'],
+      '#markup' => t('Cost:') . ' ' . $currency_symbol . ' ' .$add_price,//$new_price['full_price'],
       '#suffix' => '</div>',
     );
   }
@@ -757,11 +810,18 @@ function book_unit_form_submit(&$form, &$form_state) {
           foreach ($unit['unit']->rooms_booking_unit_options[LANGUAGE_NONE] as $option) {
             if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))])) {
               if ($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1) {
-                $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
+               // Yani: form_submit.
+               $q_name = strtolower(str_replace(array(':', ' '), '_', $option['name'])).":quantity";
+               $quantity = $form_state['values']['options'][$q_name];
+              // if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity']) && $operation_list[$option['operation']] != ROOMS_REPLACE) {
+                 $quantity = $quantity + 1;
+               //}
+               $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
                   '#name' => $option['name'],
                   '#type' => ROOMS_DYNAMIC_MODIFIER,
                   '#op_type' => $option['operation'],
-                  '#amount' => $option['value'],
+                  '#amount' => $option['value'] * $quantity,
+                  '#quantity' => $quantity,
                 );
               }
             }
@@ -1113,16 +1173,19 @@ function book_units_per_type_form($form, $form_state, $units_per_type, $start_da
               foreach ($units[$units_keys[$c - 1]]['unit']->rooms_booking_unit_options[LANGUAGE_NONE] as $option) {
                 if (isset($form_state['values'][$type][$price]['fieldset'][$c][strtolower(str_replace(array(':', ' '), '_', $option['name']))])) {
 
-                  $quantity = 1;
+                  // Yani : $quantity = 1;
                   if (isset($form_state['values'][$type][$price]['fieldset'][$c][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity']) && $operation_list[$option['operation']] != ROOMS_REPLACE) {
                     $quantity = $form_state['values'][$type][$price]['fieldset'][$c][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'] + 1;
                   }
-
+                    $quantity = $form_state['values'][$type][$price]['fieldset'][$c][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'];
+                  if($quantity > 0) $yani = $quantity*$option['value'];
+                  else $yani = $option['value'];
                   if ($form_state['values'][$type][$price]['fieldset'][$c][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1) {
                     $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
                       '#type' => ROOMS_DYNAMIC_MODIFIER,
                       '#op_type' => $option['operation'],
-                      '#amount' => $option['value'] * $quantity,
+                      '#amount' => $yani, //$option['value'] * $quantity,
+                      '#quantity' => $quantity,
                     );
                   }
                 }
@@ -2121,11 +2184,13 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $nights = $end_date->diff($start_date)->days;
 
     $hytter = variable_get('camping_setting_price_cabins_name','hytter');
-    if ($unit->type != $hytter) {
+    $hytter_2 = variable_get('camping2_setting_price_cabins_name','hytter_2');
+
+    if ($unit->type != $hytter && $unit->type != $hytter_2) {
       $full_price = $full_price + ($nights * ($adults*$adults_price +$children*$children_price)*100);
     }
 
-    // Yani: Discount 4 days and whole week.
+    // Yani: Discount 4 days and whole week. Hytter Category 1.
     $low_dayprice = variable_get('camping_setting_price_cabins_day', 475);
     $hight_dayprice = variable_get('camping_setting_price_cabins_day_hight', 549);
     if ($nights >= 4 && $nights < 7 && $unit->type == $hytter) {
@@ -2156,6 +2221,42 @@ function rooms_booking_manager_price_apply($line_item, $name) {
       if ($day_price >= $oneweek)
         $full_price = $oneweek * $nights;
     }
+
+    // Yani: hytter_2 Category 2.
+    $hytter_2 = variable_get('camping2_setting_price_cabins_name','hytter_2');
+    $low_dayprice2 = variable_get('camping2_setting_price_cabins_day', 295);
+    $hight_dayprice2 = variable_get('camping2_setting_price_cabins_day_hight', 395);
+    if ($nights >= 4 && $nights < 7 && $unit->type == $hytter_2) {
+      $day_price = $full_price/$nights;
+
+      if ($day_price == $low_dayprice2*100) {
+        $fourdays2 = variable_get('camping2_setting_price_cabins_4',$day_price);
+      }
+      elseif ($day_price == $hight_dayprice2*100) {
+        $fourdays2 = variable_get('camping2_setting_price_cabins_4_high',$day_price);
+      }
+      else $fourdays2 =$full_price;
+      $fourdays2 = $fourdays2/4*100;
+      if ($day_price >= $fourdays2)
+        $full_price = $fourdays2 * $nights;
+    }
+    // Yani: category 2 week price.
+    elseif ($nights >= 7 && $unit->type == $hytter_2) {
+      $day_price = $full_price/$nights;
+      if ($day_price >= $low_dayprice2*100 && $day_price < $hight_dayprice2*100) {
+        $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price);
+      }
+      elseif ($day_price == $hight_dayprice2*100) {
+        $oneweek2 = variable_get('camping2_setting_price_cabins_7_high',$day_price);
+      }
+      else $oneweek2 = $full_price;
+
+      $oneweek2 = $oneweek2/7*100;
+      if ($day_price >= $oneweek2)
+        $full_price = $oneweek2 * $nights;
+    }
+
+
     // Yani: end of price calculation showing in booking /cart table.
 
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $full_price;
