@@ -182,7 +182,7 @@ function rooms_booking_manager_results_page(DateTime $start_date, DateTime $end_
         $unit_types[] = $type;
       }
       // Yani: TODO if type is hytter, so hytter_2 is also included.
-      $hytter_type = variable_get('camping_setting_price_cabins_name', 'hytter');
+      $hytter_type = variable_get('camping_setting_price_cabins_name', 'hytter_2');
       if ($type == $hytter_type) {
         $hytter_2 = variable_get('camping2_setting_price_cabins_name', 'hytter_2');
         if (rooms_unit_type_load($hytter_2) != FALSE)
@@ -507,10 +507,10 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     $day_price = $price/$nights;
     $fourdays_new2 = 0;
     if ($day_price == $low_dayprice2) {
-      $fourdays_new2 = variable_get('camping2_setting_price_cabins_4',$day_price);
+      $fourdays_new2 = variable_get('camping2_setting_price_cabins_4',$day_price*4);
     }
     elseif ($day_price == $hight_dayprice2) {
-      $fourdays_new2 = variable_get('camping2_setting_price_cabins_4_high',$day_price);
+      $fourdays_new2 = variable_get('camping2_setting_price_cabins_4_high',$day_price*4);
     }
     else $fourdays_new2 =$price;
 
@@ -525,10 +525,10 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     $oneweek2 = 0;
     // Yani: TODO it could be a combination price of low and high season.
     if ($day_price >= $low_dayprice2 && $day_price < $hight_dayprice2) {
-      $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price);
+      $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price*7);
     }
     elseif ($day_price == $hight_dayprice2) {
-      $oneweek2 = variable_get('camping2_setting_price_cabins_7_high',$day_price);
+      $oneweek2 = variable_get('camping2_setting_price_cabins_7_high',$day_price*7);
     }
 
     $oneweek2 = $oneweek2/7;
