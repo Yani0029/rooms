@@ -812,10 +812,14 @@ function book_unit_form_submit(&$form, &$form_state) {
               if ($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1) {
                // Yani: form_submit.
                $q_name = strtolower(str_replace(array(':', ' '), '_', $option['name'])).":quantity";
-               $quantity = $form_state['values']['options'][$q_name];
-              // if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity']) && $operation_list[$option['operation']] != ROOMS_REPLACE) {
+               
+               $quantity = 0;
+               //$quantity = $form_state['values']['options'][$q_name];
+               if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity']) ) {
+                 $quantity = $form_state['values']['options'][$q_name];
                  $quantity = $quantity + 1;
-               //}
+               }
+               else $quantity = 1;
                $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
                   '#name' => $option['name'],
                   '#type' => ROOMS_DYNAMIC_MODIFIER,
@@ -2141,6 +2145,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $price_options = isset($line_item->rooms_booking_options[LANGUAGE_NONE]) ? $line_item->rooms_booking_options[LANGUAGE_NONE] : array();
 
     // Convert Price options in Price modifiers
+    $option_price = 0;
     foreach ($price_options as $option) {
       $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
         '#name' => $option['name'],
@@ -2148,6 +2153,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
         '#op_type' => $option['operation'],
         '#amount' => $option['value'],
       );
+      $option_price += $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))]['#amount']*100;
     }
 
     $adults = $line_item->rooms_booking_number_people[LANGUAGE_NONE][0]['value'];
@@ -2169,8 +2175,9 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     // Give other modules a chance to change the price modifiers
     drupal_alter('rooms_price_modifier', $price_modifiers, $booking_info);
 
-    $price_calendar = new UnitPricingCalendar($unit->unit_id, $price_modifiers);
-
+    //    $price_calendar = new UnitPricingCalendar($unit->unit_id, $price_modifiers);
+    // Yani: Do not change price calulation.
+    $price_calendar = new UnitPricingCalendar($unit->unit_id, array());
     $temp_end_date = clone($end_date);
     $temp_end_date->sub(new DateInterval('P1D'));
 
@@ -2230,10 +2237,10 @@ function rooms_booking_manager_price_apply($line_item, $name) {
       $day_price = $full_price/$nights;
 
       if ($day_price == $low_dayprice2*100) {
-        $fourdays2 = variable_get('camping2_setting_price_cabins_4',$day_price);
+        $fourdays2 = variable_get('camping2_setting_price_cabins_4',$day_price*4);
       }
       elseif ($day_price == $hight_dayprice2*100) {
-        $fourdays2 = variable_get('camping2_setting_price_cabins_4_high',$day_price);
+        $fourdays2 = variable_get('camping2_setting_price_cabins_4_high',$day_price*4);
       }
       else $fourdays2 =$full_price;
       $fourdays2 = $fourdays2/4*100;
@@ -2244,10 +2251,10 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     elseif ($nights >= 7 && $unit->type == $hytter_2) {
       $day_price = $full_price/$nights;
       if ($day_price >= $low_dayprice2*100 && $day_price < $hight_dayprice2*100) {
-        $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price);
+        $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price*7);
       }
       elseif ($day_price == $hight_dayprice2*100) {
-        $oneweek2 = variable_get('camping2_setting_price_cabins_7_high',$day_price);
+        $oneweek2 = variable_get('camping2_setting_price_cabins_7_high',$day_price*7);
       }
       else $oneweek2 = $full_price;
 
@@ -2258,7 +2265,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
 
     // Yani: end of price calculation showing in booking /cart table.
-
+    $full_price += $option_price;
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $full_price;
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
 
