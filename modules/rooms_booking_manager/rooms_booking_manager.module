@@ -461,24 +461,23 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   $hytter = variable_get('camping_setting_price_cabins_name','hytter');
   // Yani: add low season and high season price for cabins.
   $low_dayprice = variable_get('camping_setting_price_cabins_day', 475);
-  $hight_dayprice = variable_get('camping_setting_price_cabins_day_hight', 549);
+  $hight_dayprice = variable_get('camping_setting_price_cabins_day_high', 549);
 
   $hytter_2 = variable_get('camping2_setting_price_cabins_name','hytter_2');
   // Yani: add low season and high season price for cabins.
   $low_dayprice2 = variable_get('camping2_setting_price_cabins_day', 295);
-  $hight_dayprice2 = variable_get('camping2_setting_price_cabins_day_hight', 395);
+  $hight_dayprice2 = variable_get('camping2_setting_price_cabins_day_high', 395);
 
   // Yani: add 4 days and week price for cabins.
   if ($nights >= 4 && $nights < 7 && $unit->type == $hytter) {
     $day_price = $price/$nights;
-    $fourdays_new = 0;
+    $fourdays_new = $day_price*4;
     if ($day_price == $low_dayprice) {
-      $fourdays_new = variable_get('camping_setting_price_cabins_4',$day_price);
+      $fourdays_new = variable_get('camping_setting_price_cabins_4',$day_price*4);
     }
     elseif ($day_price == $hight_dayprice) {
-      $fourdays_new = variable_get('camping_setting_price_cabins_4_high',$day_price);
+      $fourdays_new = variable_get('camping_setting_price_cabins_4_high',$day_price*4);
     }
-    else $fourdays_new =$price;
 
     $fourdays_new = $fourdays_new/4;
     // Yani: discount price is lower than calculated price (per day)
@@ -488,13 +487,13 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   // Yani: Week price.
   elseif ($nights >= 7 && $unit->type == $hytter) {
     $day_price = $price/$nights;
-    $oneweek = 0;
+    $oneweek = $day_price*7;
     // Yani: TODO it could be a combination price of low and high season.
     if ($day_price >= $low_dayprice && $day_price < $hight_dayprice) {
-      $oneweek = variable_get('camping_setting_price_cabins_7',$day_price);
+      $oneweek = variable_get('camping_setting_price_cabins_7',$day_price*7);
     }
     elseif ($day_price == $hight_dayprice) {
-      $oneweek = variable_get('camping_setting_price_cabins_7_high',$day_price);
+      $oneweek = variable_get('camping_setting_price_cabins_7_high',$day_price*7);
     }
 
     $oneweek = $oneweek/7;
@@ -505,14 +504,13 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   // Yani: 4 days and week price for cabins. Hytter_2 Category 2
   if ($nights >= 4 && $nights < 7 && $unit->type == $hytter_2) {
     $day_price = $price/$nights;
-    $fourdays_new2 = 0;
+    $fourdays_new2 = $day_price*4;
     if ($day_price == $low_dayprice2) {
       $fourdays_new2 = variable_get('camping2_setting_price_cabins_4',$day_price*4);
     }
     elseif ($day_price == $hight_dayprice2) {
       $fourdays_new2 = variable_get('camping2_setting_price_cabins_4_high',$day_price*4);
     }
-    else $fourdays_new2 =$price;
 
     $fourdays_new2 = $fourdays_new2/4;
     // Yani: discount price is lower than calculated price (per day)
@@ -522,7 +520,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   // Yani: Week price.
   elseif ($nights >= 7 && $unit->type == $hytter_2) {
     $day_price = $price/$nights;
-    $oneweek2 = 0;
+    $oneweek2 = $day_price*7;
     // Yani: TODO it could be a combination price of low and high season.
     if ($day_price >= $low_dayprice2 && $day_price < $hight_dayprice2) {
       $oneweek2 = variable_get('camping2_setting_price_cabins_7',$day_price*7);
@@ -2199,7 +2197,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
     // Yani: Discount 4 days and whole week. Hytter Category 1.
     $low_dayprice = variable_get('camping_setting_price_cabins_day', 475);
-    $hight_dayprice = variable_get('camping_setting_price_cabins_day_hight', 549);
+    $hight_dayprice = variable_get('camping_setting_price_cabins_day_high', 549);
     if ($nights >= 4 && $nights < 7 && $unit->type == $hytter) {
       $day_price = $full_price/$nights;
       if ($day_price == $low_dayprice*100) {
