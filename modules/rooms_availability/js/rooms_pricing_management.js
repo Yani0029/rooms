@@ -62,7 +62,7 @@ Drupal.behaviors.rooms_availability = {
       phpmonth = value[1]+1;
       $(value[0]).once().fullCalendar({
         editable:false,
-        defaultView:'singleRowMonth',
+        // defaultView:'singleRowMonth',
         month:value[1],
         year:value[2],
         header:{

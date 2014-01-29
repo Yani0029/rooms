@@ -79,7 +79,7 @@ Drupal.behaviors.rooms_availability = {
         ignoreTimezone:false,
         editable:false,
         selectable: true,
-        defaultView:'singleRowMonth',
+        // defaultView:'singleRowMonth',
         month:value[1],
         year:value[2],
         header:{
