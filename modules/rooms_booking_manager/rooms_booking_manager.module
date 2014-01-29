@@ -479,7 +479,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $fourdays_new = variable_get('camping_setting_price_cabins_4_high',$day_price);
     }
     else $fourdays_new =$price;
-     
+
     $fourdays_new = $fourdays_new/4;
     // Yani: discount price is lower than calculated price (per day)
     if ($day_price >= $fourdays_new)
@@ -789,7 +789,7 @@ function book_unit_form_submit(&$form, &$form_state) {
   // reconvert them back to strings to only recreate them in the Availability Agent
   $sd = start_date_load($start_date);
   $ed = end_date_load($end_date);
-  
+
   // Let us get the available rooms again and match the order against actual rooms
   $date_format = str_replace('-', '/', variable_get('rooms_date_format', 'd-m-Y'));
   $agent = new AvailabilityAgent($sd, $ed, $group_size);
@@ -812,7 +812,7 @@ function book_unit_form_submit(&$form, &$form_state) {
               if ($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1) {
                // Yani: form_submit.
                $q_name = strtolower(str_replace(array(':', ' '), '_', $option['name'])).":quantity";
-               
+
                $quantity = 0;
                //$quantity = $form_state['values']['options'][$q_name];
                if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity']) ) {
@@ -1098,7 +1098,7 @@ function book_units_per_type_form($form, $form_state, $units_per_type, $start_da
               }
             }
 
-            // Show Persons and Children selectors if price calculation is setted to 'Price per person per night' 
+            // Show Persons and Children selectors if price calculation is setted to 'Price per person per night'
             if (variable_get('rooms_price_calculation', ROOMS_PER_NIGHT) == ROOMS_PER_PERSON) {
               $tmp_unit = $units[$units_keys[$c - 1]]['unit'];
 
@@ -1195,7 +1195,7 @@ function book_units_per_type_form($form, $form_state, $units_per_type, $start_da
                 }
               }
             }
-            
+
             // Price is calculated as 'Price per person per night'
             if (variable_get('rooms_price_calculation', ROOMS_PER_NIGHT) == ROOMS_PER_PERSON) {
               if (isset($form_state['values'][$type][$price]['fieldset'][$c]['persons'])) {
@@ -1260,7 +1260,7 @@ function book_units_per_type_form($form, $form_state, $units_per_type, $start_da
               $new_price = $price_calendar->calculatePrice($start_date, $temp_end_date);
             }
             $new_price = $new_price['full_price'];
-            
+
 
             // Replace old price with the new calculated value
             $form[$type][$price]['fieldset'][$c]['price']['#markup'] = $currency_symbol . ' ' . $new_price;
@@ -1937,7 +1937,7 @@ function rooms_booking_manager_form_alter(&$form, &$form_state, $form_id) {
     $form['rooms_checkout_style'] = array(
       '#type' => 'radios',
       '#title' => t('Checkout presentation style'),
-      '#options' => array(        
+      '#options' => array(
         ROOMS_COMMERCE_CHECKOUT => t('Commerce checkout'),
         ROOMS_ENQ_CHECKOUT => t('Enquiry checkout'),
       ),
@@ -2232,7 +2232,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     // Yani: hytter_2 Category 2.
     $hytter_2 = variable_get('camping2_setting_price_cabins_name','hytter_2');
     $low_dayprice2 = variable_get('camping2_setting_price_cabins_day', 295);
-    $hight_dayprice2 = variable_get('camping2_setting_price_cabins_day_hight', 395);
+    $hight_dayprice2 = variable_get('camping2_setting_price_cabins_day_high', 395);
     if ($nights >= 4 && $nights < 7 && $unit->type == $hytter_2) {
       $day_price = $full_price/$nights;
 
