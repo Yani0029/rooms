@@ -500,6 +500,22 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     if ($day_price >= $oneweek)
       $price = number_format($oneweek * $nights,2);
    }
+  // Yani: Weekend price. Start date = friday.
+  elseif ($nights == 3 && $start_date->format('w') == 5 && $unit->type == $hytter) {
+    $day_price = $price/$nights;
+    $oneweek = $day_price*7;
+    // Yani: TODO it could be a combination price of low and high season.
+    if ($day_price >= $low_dayprice && $day_price < $hight_dayprice) {
+      $weekend = variable_get('camping_setting_price_cabins_weekend',$day_price*3);
+    }
+    elseif ($day_price == $hight_dayprice) {
+      $weekend = variable_get('camping_setting_price_cabins_weekend_high',$day_price*3);
+    }
+
+    $weekend = $weekend/3;
+    if ($day_price >= $weekend)
+      $price = number_format($weekend * $nights,2);
+   }
 
   // Yani: 4 days and week price for cabins. Hytter_2 Category 2
   if ($nights >= 4 && $nights < 7 && $unit->type == $hytter_2) {
@@ -532,6 +548,22 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     $oneweek2 = $oneweek2/7;
     if ($day_price >= $oneweek2)
       $price = number_format($oneweek2 * $nights,2);
+   }
+  // Yani: Weekend price. Start date = friday.
+  elseif ($nights == 3 && $start_date->format('w') == 5 && $unit->type == $hytter_2) {
+    $day_price = $price/$nights;
+    $oneweek = $day_price*7;
+    // Yani: TODO it could be a combination price of low and high season.
+    if ($day_price >= $low_dayprice && $day_price < $hight_dayprice) {
+      $weekend = variable_get('camping2_setting_price_cabins_weekend',$day_price*3);
+    }
+    elseif ($day_price == $hight_dayprice) {
+      $weekend = variable_get('camping2_setting_price_cabins_weekend_high',$day_price*3);
+    }
+
+    $weekend = $weekend/3;
+    if ($day_price >= $weekend)
+      $price = number_format($weekend * $nights,2);
    }
 
 
@@ -2226,6 +2258,21 @@ function rooms_booking_manager_price_apply($line_item, $name) {
       if ($day_price >= $oneweek)
         $full_price = $oneweek * $nights;
     }
+    // Yani: Add weekend price
+    elseif ($nights == 3 && $start_date->format('w') == 5 && $unit->type == $hytter) {
+      $day_price = $full_price/$nights;
+      if ($day_price >= $low_dayprice*100 && $day_price < $hight_dayprice*100) {
+        $weekend = variable_get('camping_setting_price_cabins_weekend',$day_price);
+      }
+      elseif ($day_price == $hight_dayprice*100) {
+        $weekend = variable_get('camping_setting_price_cabins_weekend_high',$day_price);
+      }
+      else $weekend = $full_price;
+
+      $weekend = $weekend/3*100;
+      if ($day_price >= $weekend)
+        $full_price = $weekend * $nights;
+    }
 
     // Yani: hytter_2 Category 2.
     $hytter_2 = variable_get('camping2_setting_price_cabins_name','hytter_2');
@@ -2259,6 +2306,21 @@ function rooms_booking_manager_price_apply($line_item, $name) {
       $oneweek2 = $oneweek2/7*100;
       if ($day_price >= $oneweek2)
         $full_price = $oneweek2 * $nights;
+    }
+    // Yani: Add weekend price
+    elseif ($nights == 3 && $start_date->format('w') == 5 && $unit->type == $hytter_2) {
+      $day_price = $full_price/$nights;
+      if ($day_price >= $low_dayprice*100 && $day_price < $hight_dayprice*100) {
+        $weekend = variable_get('camping2_setting_price_cabins_weekend',$day_price);
+      }
+      elseif ($day_price == $hight_dayprice*100) {
+        $weekend = variable_get('camping2_setting_price_cabins_weekend_high',$day_price);
+      }
+      else $weekend = $full_price;
+
+      $weekend = $weekend/3*100;
+      if ($day_price >= $weekend)
+        $full_price = $weekend * $nights;
     }
 
 
