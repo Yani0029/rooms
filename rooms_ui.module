@@ -276,7 +276,7 @@ function camping_price_settings() {
     '#collapsible' => TRUE,
     '#group' => 'vertical_settings_tab',
   );
-  $form['camping_settings_4']["camping2_setting_price_cabins_name"] = array(
+  $form['camping_settings_4']["camping3_setting_price_cabins_name"] = array(
     '#type' => 'textfield',
     '#title' => t("Cabins name in bookable unit type"),
     '#description' => t("e.g. hytter"),
