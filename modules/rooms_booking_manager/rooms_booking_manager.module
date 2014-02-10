@@ -482,7 +482,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   elseif ($nights >= 7) {
     $oneweek = $day_price*7;
     // Yani: TODO it could be a combination price of low and high season.
-    if ($day_price >= $low_dayprice && $day_price < $high_dayprice) {
+    if ($day_price >= $low_dayprice && ($high_dayprice === FALSE || $day_price < $high_dayprice)) {
       $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7', $day_price*7);
     }
     elseif ($day_price == $high_dayprice) {
@@ -497,7 +497,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   elseif ($nights == 3 && $start_date->format('w') == 5) {
     $weekend = $day_price*3;
     // Yani: TODO it could be a combination price of low and high season.
-    if ($day_price >= $low_dayprice && $day_price < $high_dayprice) {
+    if ($day_price >= $low_dayprice && ($high_dayprice === FALSE || $day_price < $high_dayprice)) {
       $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend', $day_price*3);
     }
     elseif ($day_price == $high_dayprice) {
@@ -2185,7 +2185,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     elseif ($nights >= 7) {
       $oneweek = $day_price*7;
       // Yani: TODO it could be a combination price of low and high season.
-      if ($day_price >= $low_dayprice && $day_price < $high_dayprice) {
+      if ($day_price >= $low_dayprice && ($high_dayprice === FALSE || $day_price < $high_dayprice)) {
         $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7', $day_price*7);
       }
       elseif ($day_price == $high_dayprice) {
@@ -2200,7 +2200,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     elseif ($nights == 3 && $start_date->format('w') == 5) {
       $weekend = $day_price*3;
       // Yani: TODO it could be a combination price of low and high season.
-      if ($day_price >= $low_dayprice && $day_price < $high_dayprice) {
+      if ($day_price >= $low_dayprice && ($high_dayprice === FALSE || $day_price < $high_dayprice)) {
         $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend', $day_price*3);
       }
       elseif ($day_price == $high_dayprice) {
