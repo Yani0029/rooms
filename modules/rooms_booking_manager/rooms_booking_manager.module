@@ -457,56 +457,60 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   $adults_price = variable_get('camping_setting_price_adults', 0);
   $children_price = variable_get('camping_setting_price_children', 0);
   $include_price_per_person = variable_get('camping_setting_include_price_per_person_' . $unit->type, FALSE);
+  $enable_season_calculation = variable_get('camping_setting_enable_seasons_' . $unit->type, FALSE);
+
   $nights = $end_date->diff($start_date)->days;
   $day_price = $price/$nights;
 
   $low_dayprice = variable_get('camping_setting_price_' . $unit->type . '_day', FALSE);
   $high_dayprice = variable_get('camping_setting_price_' . $unit->type . '_day_high', FALSE);
 
-  if ($nights >= 4 && $nights < 7) {
-    $fourdays = $day_price*4;
-    if ($day_price == $low_dayprice) {
-      $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4', $day_price*4);
-    }
-    elseif ($day_price == $high_dayprice) {
-      $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4_high', $day_price*4);
-    }
+  if ($enable_season_calculation) {
+    if ($nights >= 4 && $nights < 7) {
+      $fourdays = $day_price*4;
+      if ($day_price == $low_dayprice) {
+        $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4', $day_price*4);
+      }
+      elseif ($day_price == $high_dayprice) {
+        $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4_high', $day_price*4);
+      }
 
-    $fourdays = $fourdays/4;
-    // Yani: discount price is lower than calculated price (per day)
-    if ($day_price >= $fourdays){
-      $price = number_format($fourdays * $nights,2);
+      $fourdays = $fourdays/4;
+      // Yani: discount price is lower than calculated price (per day)
+      if ($day_price >= $fourdays){
+        $price = number_format($fourdays * $nights,2);
+      }
     }
-  }
-  // Yani: Week price.
-  elseif ($nights >= 7) {
-    $oneweek = $day_price*7;
-    // Yani: TODO it could be a combination price of low and high season.
-    if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
-      $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7', $day_price*7);
-    }
-    elseif ($day_price == $high_dayprice) {
-      $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7_high', $day_price*7);
-    }
+    // Yani: Week price.
+    elseif ($nights >= 7) {
+      $oneweek = $day_price*7;
+      // Yani: TODO it could be a combination price of low and high season.
+      if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
+        $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7', $day_price*7);
+      }
+      elseif ($day_price == $high_dayprice) {
+        $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7_high', $day_price*7);
+      }
 
-    $oneweek = $oneweek/7;
-    if ($day_price >= $oneweek)
-      $price = number_format($oneweek * $nights,2);
-   }
-  // Yani: Weekend price. Start date = friday.
-  elseif ($nights == 3 && $start_date->format('w') == 5) {
-    $weekend = $day_price*3;
-    // Yani: TODO it could be a combination price of low and high season.
-    if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
-      $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend', $day_price*3);
-    }
-    elseif ($day_price == $high_dayprice) {
-      $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend_high', $day_price*3);
-    }
+      $oneweek = $oneweek/7;
+      if ($day_price >= $oneweek)
+        $price = number_format($oneweek * $nights,2);
+     }
+    // Yani: Weekend price. Start date = friday.
+    elseif ($nights == 3 && $start_date->format('w') == 5) {
+      $weekend = $day_price*3;
+      // Yani: TODO it could be a combination price of low and high season.
+      if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
+        $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend', $day_price*3);
+      }
+      elseif ($day_price == $high_dayprice) {
+        $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend_high', $day_price*3);
+      }
 
-    $weekend = $weekend/3;
-    if ($day_price >= $weekend)
-      $price = number_format($weekend * $nights,2);
+      $weekend = $weekend/3;
+      if ($day_price >= $weekend)
+        $price = number_format($weekend * $nights,2);
+    }
   }
 
   // Yani: Adults and children price for other types.
@@ -2160,56 +2164,59 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $adults_price = variable_get('camping_setting_price_adults', 0);
     $children_price = variable_get('camping_setting_price_children', 0);
     $include_price_per_person = variable_get('camping_setting_include_price_per_person_' . $unit->type, FALSE);
+    $enable_season_calculation = variable_get('camping_setting_enable_seasons_' . $unit->type, FALSE);
     $nights = $end_date->diff($start_date)->days;
     $day_price = $full_price/$nights;
 
     $low_dayprice = variable_get('camping_setting_price_' . $unit->type . '_day', FALSE) * 100;
     $high_dayprice = variable_get('camping_setting_price_' . $unit->type . '_day_high', FALSE) * 100;
 
-    if ($nights >= 4 && $nights < 7) {
-      $fourdays = $day_price*4;
-      if ($day_price == $low_dayprice) {
-        $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4', $day_price*4);
-      }
-      elseif ($day_price == $high_dayprice) {
-        $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4_high', $day_price*4);
-      }
+    if ($enable_season_calculation) {
+      if ($nights >= 4 && $nights < 7) {
+        $fourdays = $day_price*4;
+        if ($day_price == $low_dayprice) {
+          $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4', $day_price*4);
+        }
+        elseif ($day_price == $high_dayprice) {
+          $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4_high', $day_price*4);
+        }
 
-      $fourdays = $fourdays/4*100;
-      // Yani: discount price is lower than calculated price (per day)
-      if ($day_price >= $fourdays){
-        $full_price = number_format($fourdays * $nights,2);
+        $fourdays = $fourdays/4*100;
+        // Yani: discount price is lower than calculated price (per day)
+        if ($day_price >= $fourdays){
+          $full_price = number_format($fourdays * $nights,2);
+        }
       }
-    }
-    // Yani: Week price.
-    elseif ($nights >= 7) {
-      $oneweek = $day_price*7;
-      // Yani: TODO it could be a combination price of low and high season.
-      if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
-        $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7', $day_price*7);
-      }
-      elseif ($day_price == $high_dayprice) {
-        $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7_high', $day_price*7);
-      }
+      // Yani: Week price.
+      elseif ($nights >= 7) {
+        $oneweek = $day_price*7;
+        // Yani: TODO it could be a combination price of low and high season.
+        if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
+          $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7', $day_price*7);
+        }
+        elseif ($day_price == $high_dayprice) {
+          $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7_high', $day_price*7);
+        }
 
-      $oneweek = $oneweek/7*100;
-      if ($day_price >= $oneweek)
-        $full_price = number_format($oneweek * $nights,2);
-     }
-    // Yani: Weekend price. Start date = friday.
-    elseif ($nights == 3 && $start_date->format('w') == 5) {
-      $weekend = $day_price*3;
-      // Yani: TODO it could be a combination price of low and high season.
-      if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
-        $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend', $day_price*3);
-      }
-      elseif ($day_price == $high_dayprice) {
-        $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend_high', $day_price*3);
-      }
+        $oneweek = $oneweek/7*100;
+        if ($day_price >= $oneweek)
+          $full_price = number_format($oneweek * $nights,2);
+       }
+      // Yani: Weekend price. Start date = friday.
+      elseif ($nights == 3 && $start_date->format('w') == 5) {
+        $weekend = $day_price*3;
+        // Yani: TODO it could be a combination price of low and high season.
+        if ($day_price >= $low_dayprice && ($high_dayprice == FALSE || $day_price < $high_dayprice)) {
+          $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend', $day_price*3);
+        }
+        elseif ($day_price == $high_dayprice) {
+          $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend_high', $day_price*3);
+        }
 
-      $weekend = $weekend/3*100;
-      if ($day_price >= $weekend)
-        $full_price = number_format($weekend * $nights,2);
+        $weekend = $weekend/3*100;
+        if ($day_price >= $weekend)
+          $full_price = number_format($weekend * $nights,2);
+      }
     }
 
     if ($include_price_per_person) {

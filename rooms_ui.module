@@ -140,6 +140,11 @@ function camping_price_settings() {
       '#title' => t($unit_label . ' Calculate price including number of children/adults.'),
       '#default_value' => variable_get('camping_setting_include_price_per_person_' . $unit_type, FALSE),
     );
+    $form['camping_settings_' . $unit_type]['camping_setting_enable_seasons_' . $unit_type] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Enable seasons calculations for ' . $unit_type),
+      '#default_value' => variable_get('camping_setting_enable_seasons_' . $unit_type, FALSE),
+    );
      $form['camping_settings_' . $unit_type]['low'] = array(
       '#type' => 'fieldset',
       '#title' => t('Camping ' . $unit_label . ' low season'),
