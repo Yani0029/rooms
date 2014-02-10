@@ -135,69 +135,69 @@ function camping_price_settings() {
       '#collapsible' => TRUE,
       '#group' => 'vertical_settings_tab',
     );
-    $form['camping_settings_' . $unit_type]['camping_setting_include_price_per_person_' . $unit->type] = array(
+    $form['camping_settings_' . $unit_type]['camping_setting_include_price_per_person_' . $unit_type] = array(
       '#type' => 'checkbox',
       '#title' => t($unit_label . ' Calculate price including number of children/adults.'),
-      '#default_value' => variable_get('camping_setting_include_price_per_person_' . $unit->type, FALSE),
+      '#default_value' => variable_get('camping_setting_include_price_per_person_' . $unit_type, FALSE),
     );
      $form['camping_settings_' . $unit_type]['low'] = array(
       '#type' => 'fieldset',
       '#title' => t('Camping ' . $unit_label . ' low season'),
       '#collapsible' => FALSE,
     );
-    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit->type . '_day'] = array(
+    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit_type . '_day'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' Low Season day price'),
       '#description' => t("e.g. 475"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_day'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_day'),
     );
-    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit->type . '_4'] = array(
+    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit_type . '_4'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' price for 4 days'),
       '#description' => t("e.g. 1695"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_4'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_4'),
     );
-    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit->type . '_7'] = array(
+    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit_type . '_7'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' price for one week'),
       '#description' => t("e.g 2775"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_7'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_7'),
     );
-    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit->type . '_weekend'] = array(
+    $form['camping_settings_' . $unit_type]['low']['camping_setting_price_' . $unit_type . '_weekend'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' price for one weekend'),
       '#description' => t("e.g 2500"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_weekend'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_weekend'),
     );
     $form['camping_settings_' . $unit_type]['high'] = array(
       '#type' => 'fieldset',
       '#title' => t('Camping ' . $unit_label . ' high season'),
       '#collapsible' => FALSE,
     );
-    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit->type . '_day_high'] = array(
+    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit_type . '_day_high'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' High Season day price'),
       '#description' => t("e.g. 549"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_day_high'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_day_high'),
     );
 
-    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit->type . '_4_high'] = array(
+    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit_type . '_4_high'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' price for 4 days'),
       '#description' => t("e.g. 1995"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_4_high'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_4_high'),
     );
-    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit->type . '_7_high'] = array(
+    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit_type . '_7_high'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' price for one week'),
       '#description' => t("e.g 3275"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_7_high'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_7_high'),
     );
-    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit->type . '_weekend_high'] = array(
+    $form['camping_settings_' . $unit_type]['high']['camping_setting_price_' . $unit_type . '_weekend_high'] = array(
       '#type' => 'textfield',
       '#title' => t($unit_label . ' price for one weekend'),
       '#description' => t("e.g 2500"),
-      '#default_value' => variable_get('camping_setting_price_' . $unit->type . '_weekend_high'),
+      '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_weekend_high'),
     );
 
   }
