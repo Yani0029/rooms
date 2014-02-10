@@ -2161,7 +2161,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $children_price = variable_get('camping_setting_price_children', 0);
     $include_price_per_person = variable_get('camping_setting_include_price_per_person_' . $unit->type, FALSE);
     $nights = $end_date->diff($start_date)->days;
-    $day_price = $price/$nights;
+    $day_price = $full_price/$nights;
 
     $low_dayprice = variable_get('camping_setting_price_' . $unit->type . '_day', FALSE) * 100;
     $high_dayprice = variable_get('camping_setting_price_' . $unit->type . '_day_high', FALSE) * 100;
