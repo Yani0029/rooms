@@ -181,6 +181,20 @@ function rooms_booking_manager_results_page(DateTime $start_date, DateTime $end_
       if (rooms_unit_type_load($type) !== FALSE) {
         $unit_types[] = $type;
       }
+      else {
+        $type = explode(',',$type);
+        if (isset($type[1]) && rooms_unit_type_load($type[0] && rooms_unit_type_load($type[1]))) {
+          $unit_types[] = $type[1];
+          $unit_types[] = $type[2];
+        }
+        else {
+          $type = explode('%2C',$type);
+          if (isset($type[1]) && rooms_unit_type_load($type[0] && rooms_unit_type_load($type[1]))) {
+            $unit_types[] = $type[1];
+            $unit_types[] = $type[2];
+          }
+        }
+      }
       // Yani: TODO if type is hytter, so hytter_2 is also included.
       $hytter_type = variable_get('camping_setting_price_cabins_name', 'hytter_2');
       if ($type == $hytter_type) {
