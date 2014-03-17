@@ -66,6 +66,10 @@ class AvailabilityAgentSizeFilter extends AvailabilityAgentCommonFilter {
     $group_size_children = isset($this->parameters['group_size_children']) ? $this->parameters['group_size_children'] : 0;
     $unit_types = isset($this->parameters['unit_types']) ? $this->parameters['unit_types'] : NULL;
 
+    if (variable_get('rooms_include_children_in_max_sleeps', FALSE)) {
+      $group_size = $group_size_children = $group_size + $group_size_children;
+    }
+
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'rooms_unit')
           ->propertyOrderBy('max_sleeps', 'ASC')
