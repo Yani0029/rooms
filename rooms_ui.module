@@ -98,7 +98,7 @@ function camping_price_settings() {
         $form['camping_settings']["camping_setting_menu_links_$menu_title"] = array(
           '#type' => 'textfield',
           '#title' => t("menu link -'$menu_title'"),
-          '#description' => t("Go to admin/rooms/units/unit-types to find the machine name of the type."),
+          '#description' => t("Go to admin/rooms/units/unit-types to find the machine name of the type. Add ',' after every value for multi type"),
           '#default_value' => variable_get("camping_setting_menu_links_$menu_title", ''),
         );
     }
