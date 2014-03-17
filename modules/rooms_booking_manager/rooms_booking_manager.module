@@ -474,7 +474,9 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       elseif ($day_price == $high_dayprice) {
         $fourdays = variable_get('camping_setting_price_' . $unit->type . '_4_high', $day_price*4);
       }
-
+      if (!$fourdays) {
+        $fourdays = $day_price * 4;
+      }
       $fourdays = $fourdays/4;
       // Yani: discount price is lower than calculated price (per day)
       if ($day_price >= $fourdays){
@@ -491,7 +493,9 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       elseif ($day_price == $high_dayprice) {
         $oneweek = variable_get('camping_setting_price_' . $unit->type . '_7_high', $day_price*7);
       }
-
+      if (!$oneweek) {
+        $oneweek = $day_price * 7;
+      }
       $oneweek = $oneweek/7;
       if ($day_price >= $oneweek)
         $price = number_format($oneweek * $nights,2);
@@ -506,7 +510,9 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       elseif ($day_price == $high_dayprice) {
         $weekend = variable_get('camping_setting_price_' . $unit->type . '_weekend_high', $day_price*3);
       }
-
+      if (!$weekend) {
+        $weekend = $day_price * 3;
+      }
       $weekend = $weekend/3;
       if ($day_price >= $weekend)
         $price = number_format($weekend * $nights,2);
