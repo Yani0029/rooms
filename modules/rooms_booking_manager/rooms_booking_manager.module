@@ -184,8 +184,9 @@ function rooms_booking_manager_results_page(DateTime $start_date, DateTime $end_
       else {
         $type_menu = explode(',',$type);
         if (isset($type_menu[1])) {
-          $unit_types[] = $type_menu[0];
-          $unit_types[] = $type_menu[1];
+          foreach ($type_menu as $key => $menu_type) {
+            $unit_types[] = $menu_type;
+          }
         }
       }
       // Yani: TODO if type is hytter, so hytter_2 is also included.
