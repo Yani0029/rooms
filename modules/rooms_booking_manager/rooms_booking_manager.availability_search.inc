@@ -214,7 +214,47 @@ function rooms_booking_availability_search_form($form, $form_state) {
         $form['unit_type']['#default_value'] = $menu_option[$type_link];
       }
   }
+  // Yani: add another product type for the options like electricity, dogs, cats and so on.
+  $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
+  $query->condition('type', 'product' , '=');
+  $option_products = $query->execute()->fetchAll();
 
+  foreach ($option_products as $option_product) {
+    $product_id = $option_product->product_id;
+    $product_sku = $option_product->sku;
+    $product = commerce_product_load($product_id);
+    // option type 1 for electricity, checkbox
+    if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
+      $form['rooms_fieldset']['product_options_' . $product_id] = array(
+          '#title' => $product_sku,
+          '#type' => 'checkbox',
+          '#default_value' =>  '0',
+          '#prefix' => '<td>',
+          '#suffix' => '</td>',
+        );
+    }
+    // option type 2 for dogs, select
+    elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
+      $form['rooms_fieldset']['product_options_' . $product_id] = array(
+          '#type' => 'select',
+          '#title' => $product_sku,
+          '#options' => array(
+            '0' => '0',
+            '1' => '1',
+            '2' => '2',
+            '3' => '3',
+            '4' => '4',
+            '5' => '5',
+            '6' => '6',
+            '7' => '7',
+            '8' => '8',
+          ),
+          '#default_value' =>  '0',
+          '#prefix' => '<td>',
+          '#suffix' => '</td>',
+        );
+    }
+  }
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
