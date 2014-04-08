@@ -214,6 +214,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
         $form['unit_type']['#default_value'] = $menu_option[$type_link];
       }
   }
+  /*
   // Yani: add another product type for the options like electricity, dogs, cats and so on.
   $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
   $query->condition('type', 'product' , '=');
@@ -254,7 +255,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
           '#suffix' => '</td>',
         );
     }
-  }
+  }*/
   $form['actions'] = array(
     '#type' => 'container',
     '#attributes' => array('class' => array('form-actions')),
