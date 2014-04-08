@@ -231,6 +231,9 @@ function rooms_booking_availability_search_form($form, $form_state) {
 
       // option type 1 for electricity, checkbox
       if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
+        if ($product_sku == 'El') {
+          $product_info .= "(0 kr. i hytter)";
+        }
         $form['rooms_fieldset']['product_options_' . $product_id] = array(
           '#title' => $product_sku,
           '#type' => 'checkbox',
@@ -242,6 +245,9 @@ function rooms_booking_availability_search_form($form, $form_state) {
       }
       // option type 2 for dogs, select
       elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
+        if ($product_sku == 'Hund') {
+          $product_info .= " (50.00 kr. i hytter)";
+        }
         $form['rooms_fieldset']['product_options_' . $product_id] = array(
           '#type' => 'select',
           '#description' => $product_info,
