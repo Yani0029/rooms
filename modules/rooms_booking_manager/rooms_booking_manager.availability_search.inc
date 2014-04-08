@@ -220,23 +220,24 @@ function rooms_booking_availability_search_form($form, $form_state) {
   $query->condition('type', 'product' , '=');
   $option_products = $query->execute()->fetchAll();
 
-  foreach ($option_products as $option_product) {
-    $product_id = $option_product->product_id;
-    $product_sku = $option_product->sku;
-    $product = commerce_product_load($product_id);
-    // option type 1 for electricity, checkbox
-    if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
-      $form['rooms_fieldset']['product_options_' . $product_id] = array(
+  if (isset($option_products)) {
+    foreach ($option_products as $option_product) {
+      $product_id = $option_product->product_id;
+      $product_sku = $option_product->sku;
+      $product = commerce_product_load($product_id);
+      // option type 1 for electricity, checkbox
+      if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
+        $form['rooms_fieldset']['product_options_' . $product_id] = array(
           '#title' => $product_sku,
           '#type' => 'checkbox',
           '#default_value' =>  '0',
           '#prefix' => '<td>',
           '#suffix' => '</td>',
         );
-    }
-    // option type 2 for dogs, select
-    elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
-      $form['rooms_fieldset']['product_options_' . $product_id] = array(
+      }
+      // option type 2 for dogs, select
+      elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
+        $form['rooms_fieldset']['product_options_' . $product_id] = array(
           '#type' => 'select',
           '#title' => $product_sku,
           '#options' => array(
@@ -254,6 +255,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
           '#prefix' => '<td>',
           '#suffix' => '</td>',
         );
+      }
     }
   }*/
   $form['actions'] = array(
