@@ -224,11 +224,17 @@ function rooms_booking_availability_search_form($form, $form_state) {
       $product_id = $option_product->product_id;
       $product_sku = $option_product->sku;
       $product = commerce_product_load($product_id);
+      $product_pris_amount = $product->commerce_price['und'][0]['amount'];
+      $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
+      $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
+      $product_info = $product->title. " - " .$product_pris ;
+
       // option type 1 for electricity, checkbox
       if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
         $form['rooms_fieldset']['product_options_' . $product_id] = array(
           '#title' => $product_sku,
           '#type' => 'checkbox',
+          '#description' => $product_info,
           '#default_value' =>  '0',
           '#prefix' => '<td>',
           '#suffix' => '</td>',
@@ -238,6 +244,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
       elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
         $form['rooms_fieldset']['product_options_' . $product_id] = array(
           '#type' => 'select',
+          '#description' => $product_info,
           '#title' => $product_sku,
           '#options' => array(
             '0' => '0',
