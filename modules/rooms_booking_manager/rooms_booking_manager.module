@@ -970,8 +970,13 @@ function book_unit_form_submit(&$form, &$form_state) {
             $quantity = $option['amount'];
             break;
         }
+        $booking_days = array(
+          LANGUAGE_NONE => array(array(
+            'value' => $nights_1,
+          )),
+        );
         $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
-        $option_item->booking_nights = $nights_1;
+        $option_item->field_booking_days = $booking_days;
         $line_item = commerce_cart_product_add($user->uid, $option_item, FALSE);
       }
 
@@ -2393,7 +2398,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
   }
   elseif ($line_item->type == 'product'){
     $quantity = $line_item->quantity;
-    $nights = $line_item->booking_nights;
+    $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
     if ($quantity != $nights) {
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $unit_price * ($quantity/$nights);
