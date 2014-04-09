@@ -834,37 +834,35 @@ function book_unit_with_options($start_date,$end_date,$values){
   $total_price = 0;
   if (isset($result_option_products)) {
     foreach ($result_option_products as $option_product) {
-      if($values['searchProductOptions_' . $product_id]) {
-        $product_id = $option_product->product_id;
-        $product_sku = $option_product->sku;
-        $product = commerce_product_load($product_id);
-        $product_pris_amount = $product->commerce_price['und'][0]['amount'];
-        $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
-        $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
-        $product_info = $product->title. " - " .$product_pris ;
+      $product_id = $option_product->product_id;
+      $product_sku = $option_product->sku;
+      $product = commerce_product_load($product_id);
+      $product_pris_amount = $product->commerce_price['und'][0]['amount'];
+      $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
+      $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
+      $product_info = $product->title. " - " .$product_pris ;
 
-        if(isset($values['searchProductOptions_' . $product_id]) && isset($product->field_option_type['und'])) {
-          $option_type = $product->field_option_type['und'][0]['value'];
-          switch($option_type) {
-            case 1:
-              $total_price = $product_pris_amount * $nights;
-              break;
-            case 2:
-              $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id] * $nights;
-              break;
-            case 2:
-              $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id];
-              break;
-          }
-          $options[] = array(
+      if(isset($values['searchProductOptions_' . $product_id]) && $values['searchProductOptions_' . $product_id] > 0 && isset($product->field_option_type['und'])) {
+        $option_type = $product->field_option_type['und'][0]['value'];
+        switch($option_type) {
+          case 1:
+            $total_price = $product_pris_amount * $nights;
+            break;
+          case 2:
+            $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id] * $nights;
+            break;
+          case 2:
+            $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id];
+            break;
+        }
+        $options[] = array(
                   'product_id' => $product_id,
                   'product_info' => $product_info,
                   'type' => $option_type,
                   'amount' => $values['searchProductOptions_' . $product_id],
                   'price' => $product_pris,
                   'total_price' => commerce_currency_format($total_price,$product_pris_currency,$product,TRUE),
-          );
-        }
+        );
       }
     }
   }
