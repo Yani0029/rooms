@@ -719,15 +719,15 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $new_price = $price_calendar->calculatePrice($start_date, $end_date, $unit->max_sleeps);
     }
 
-    $form['new_price'] = array(
+/*    $form['new_price'] = array(
       '#prefix' => '<div id="unit_' . $unit->unit_id . '_price" style="font-weight:bold">',
       '#markup' => t('Cost:') . ' ' . $currency_symbol . ' ' .$add_price,//$new_price['full_price'],
       '#suffix' => '</div>',
-    );
+    );*/
   }
 
   // Yani: Add option products here.
-  $options = book_unit_with_options($start_date,$end_date);
+  $options = book_unit_with_options($start_date,$end_date,$form_state['values']);
   if (!empty($options)) {
     foreach ($options as $key => $option) {
       $form['booking_product_options_'.$option['product_id']] = array(
@@ -796,10 +796,11 @@ function rooms_booking_manager_price_change_callback(&$form, $form_state) {
  *
  * @param $start_date
  * @param $end_date
+ * @param $values form_state['values']
  * @author Yani Xu <yx@bellcom.dk>
  * @return array $options
  */
-function book_unit_with_options($start_date,$end_date){
+function book_unit_with_options($start_date,$end_date,$values){
   $nights = $end_date->diff($start_date)->days;
   // Yani: get all the selected option products.
   $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
@@ -818,13 +819,13 @@ function book_unit_with_options($start_date,$end_date){
       $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
       $product_info = $product->title. " - " .$product_pris ;
 
-      if(variable_get('search_product_options_' . $product_id) && isset($product->field_option_type['und'])) {
+      if($values['search_product_options_' . $product_id] && isset($product->field_option_type['und'])) {
         $option_type = $product->field_option_type['und'][0]['value'];
         $options[] = array(
                   'product_id' => $product_id,
                   'product_info' => $product_info,
                   'type' => $option_type,
-                  'amount' => variable_get('product_options_' . $product_id),
+                  'amount' => $values['search_product_options_' . $product_id],
                   'price' => $product_pris,
         );
         switch($option_type) {
@@ -839,7 +840,6 @@ function book_unit_with_options($start_date,$end_date){
             break;
         }
         $options[]['total_price'] = commerce_currency_format($total_price,$product_pris_currency,$product,TRUE);
-
       }
     }
   }
