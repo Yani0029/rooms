@@ -760,23 +760,23 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       switch ($option['type']) {
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
-            '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . '<br />' . $nights_text . ' Total pris : ' .$option['total_price'],
-            '#suffix' => '</div>',
+            '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
+            '#markup' => "<span>" .$option['product_info'] . '</span><br /><span style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : ' .$option['total_price'] ."</span>",
+            '#suffix' => '</div><br />',
           );
           break;
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . '<br />' .t('Antal') ." : ". $option['amount'] . ", ". $nights_text . ' Total pris : ' .$option['total_price'],
-            '#suffix' => '</div>',
+            '#markup' => "<span>" .$option['product_info'] . '</span><br /><span style="font-weight:bold; text-align: right">' .t('Antal') ." : ". $option['amount'] . ", ". $nights_text . ' Total pris : ' .$option['total_price'] ."</span>",
+            '#suffix' => '</div><br />',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . '<br /> ' .t('Antal') . " : " . $option['amount'] . ' Total pris :' .$option['total_price'],
-            '#suffix' => '</div>',
+            '#markup' => "<span>" .$option['product_info'] . '</span><br /><span style="font-weight:bold; text-align: right">' .t('Antal') . " : " . $option['amount'] . ' Total pris :' .$option['total_price'] ."</span>",
+            '#suffix' => '</div><br />',
           );
           break;
       }
