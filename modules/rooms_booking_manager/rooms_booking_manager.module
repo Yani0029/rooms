@@ -761,21 +761,21 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . ' ' . $nights_text . ' ' .$option['total_price'],
+            '#markup' => $option['product_info'] . '<br />' . $nights_text . ' Total pris : ' .$option['total_price'],
             '#suffix' => '</div>',
           );
           break;
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . ' ' .t('Amount') ." : ". $option['amount'] . " - ". $nights_text . ' ' .$option['total_price'],
+            '#markup' => $option['product_info'] . '<br />' .t('Antal') ." : ". $option['amount'] . ", ". $nights_text . ' Total pris : ' .$option['total_price'],
             '#suffix' => '</div>',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . ' ' .t('Antal') . " : " . $option['amount'] . ' - ' .$option['total_price'],
+            '#markup' => $option['product_info'] . '<br /> ' .t('Antal') . " : " . $option['amount'] . ' Total pris :' .$option['total_price'],
             '#suffix' => '</div>',
           );
           break;
