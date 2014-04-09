@@ -768,14 +768,14 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . ' ' .t('Amount') . $option['amount'] . " - ". $nights_text . ' ' .$option['total_price'],
+            '#markup' => $option['product_info'] . ' ' .t('Amount') ." : ". $option['amount'] . " - ". $nights_text . ' ' .$option['total_price'],
             '#suffix' => '</div>',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '" style="font-weight:bold">',
-            '#markup' => $option['product_info'] . ' ' .t('Amount') . $option['amount'] . ' ' .$option['total_price'],
+            '#markup' => $option['product_info'] . ' ' .t('Antal') . " : " . $option['amount'] . ' - ' .$option['total_price'],
             '#suffix' => '</div>',
           );
           break;
@@ -838,13 +838,6 @@ function book_unit_with_options($start_date,$end_date,$values){
 
       if(isset($values['searchProductOptions_' . $product_id]) && isset($product->field_option_type['und'])) {
         $option_type = $product->field_option_type['und'][0]['value'];
-        $options[] = array(
-                  'product_id' => $product_id,
-                  'product_info' => $product_info,
-                  'type' => $option_type,
-                  'amount' => $values['searchProductOptions_' . $product_id],
-                  'price' => $product_pris,
-        );
         switch($option_type) {
           case 1:
             $total_price = $product_pris_amount * $nights;
@@ -856,7 +849,14 @@ function book_unit_with_options($start_date,$end_date,$values){
             $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id];
             break;
         }
-        $options[]['total_price'] = commerce_currency_format($total_price,$product_pris_currency,$product,TRUE);
+        $options[] = array(
+                  'product_id' => $product_id,
+                  'product_info' => $product_info,
+                  'type' => $option_type,
+                  'amount' => $values['searchProductOptions_' . $product_id],
+                  'price' => $product_pris,
+                  'total_price' => commerce_currency_format($total_price,$product_pris_currency,$product,TRUE),
+        );
       }
     }
   }
