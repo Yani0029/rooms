@@ -823,7 +823,7 @@ function book_unit_with_options($start_date,$end_date,$values){
   }
   else {
     $nights = strtotime($end_date) - strtotime($start_date);
-    $nights = $nights/60*60*60;
+    $nights = floor($nights/(60*60*24));
   }
   // Yani: get all the selected option products.
   $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
@@ -890,8 +890,8 @@ function book_unit_form_submit(&$form, &$form_state) {
   $children = $form_state['values']['children'];
   $status = $form_state['values']['status'];
 
-  $nights = strtotime($end_date) - strtotime($start_date);
-  $nights = $nights/60*60*60;
+  $nights_1 = strtotime($end_date) - strtotime($start_date);
+  $nights_1 = floor($nights_1/(60*60*24));
   // This is very inefficient right now but we need to create date objects
   // reconvert them back to strings to only recreate them in the Availability Agent
   $sd = start_date_load($start_date);
@@ -961,10 +961,10 @@ function book_unit_form_submit(&$form, &$form_state) {
         $product = commerce_product_load($option['product_id']);
         switch($option['type']) {
           case 1:
-            $quantity = $nights;
+            $quantity = $nights_1;
             break;
           case 2:
-            $quantity = $option['amount'] * $nights;
+            $quantity = $option['amount'] * $nights_1;
             break;
           case 3:
             $quantity = $option['amount'];
