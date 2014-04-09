@@ -747,9 +747,9 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   $options = book_unit_with_options($start_date,$end_date,$option_products);
   if (!empty($options)) {
     foreach ($options as $key => $option) {
-      $form['booking_product_options_'.$option['product_id']] = array(
+      $form['searchProductOptions_'.$option['product_id']] = array(
         '#type' => 'hidden',
-        '#value' => $option['product_id'] * $option['amount'],
+        '#value' => $option['amount'],
       );
       if ($nights == 1) {
         $nights_text = $nights ." ". t("day");
@@ -884,6 +884,7 @@ function book_unit_form_submit(&$form, &$form_state) {
   $children = $form_state['values']['children'];
   $status = $form_state['values']['status'];
 
+  $nights = $end_date->diff($start_date)->days;
   // This is very inefficient right now but we need to create date objects
   // reconvert them back to strings to only recreate them in the Availability Agent
   $sd = start_date_load($start_date);
@@ -903,7 +904,7 @@ function book_unit_form_submit(&$form, &$form_state) {
       $unit = array_pop($available_units);
 
       $price_modifiers = array();
-      if (isset($form_state['values']['options'])) {
+/*      if (isset($form_state['values']['options'])) {
         // Convert Price options in Price modifiers
         if (isset($unit['unit']->rooms_booking_unit_options[LANGUAGE_NONE])) {
           foreach ($unit['unit']->rooms_booking_unit_options[LANGUAGE_NONE] as $option) {
@@ -931,15 +932,42 @@ function book_unit_form_submit(&$form, &$form_state) {
           }
         }
       }
-
+*/
       // Create line item
       $line_item = rooms_create_line_item($unit, $agent, array('adults' => $group_size, 'children' => $children), $price_modifiers);
-
       // Add line item to cart
       $line_item = commerce_cart_product_add($user->uid, $line_item, FALSE);
 
-      // Send user to cart
+      // Yani : Create option line item
+      /**
+        * $options[] = array(
+                  'product_id' => $product_id,
+                  'product_info' => $product_info,
+                  'type' => $option_type,
+                  'amount' => $values['searchProductOptions_' . $product_id],
+                  'price' => $product_pris,
+                  'total_price' => commerce_currency_format($total_price,$product_pris_currency,$product,TRUE),
+           );
+        */
+      $options = book_unit_with_options($start_date,$end_date,$form_state['values']);
+      foreach ($options as $key =>$option) {
+        $product = commerce_product_load($option['product_id']);
+        switch($option['type']) {
+          case 1:
+            $quantity = $nights;
+            break;
+          case 2:
+            $quantity = $option['amount'] * $nights;
+            break;
+          case 3:
+            $quantity = $option['amount'];
+            break;
+        }
+        $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
+        $line_item = commerce_cart_product_add($user->uid, $option_item, FALSE);
+      }
 
+      // Send user to cart
       drupal_goto('bookings');
 
     }
