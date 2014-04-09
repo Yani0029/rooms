@@ -234,7 +234,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
         if ($product_sku == 'El') {
           $product_info .= "(0 kr. i hytter)";
         }
-        $form['rooms_fieldset']['product_options_' . $product_id] = array(
+        $form['rooms_fieldset']['search_product_options_' . $product_id] = array(
           '#title' => $product_sku,
           '#type' => 'checkbox',
           '#description' => $product_info,
@@ -248,7 +248,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
         if ($product_sku == 'Hund') {
           $product_info .= " (50.00 kr. i hytter)";
         }
-        $form['rooms_fieldset']['product_options_' . $product_id] = array(
+        $form['rooms_fieldset']['search_product_options_' . $product_id] = array(
           '#type' => 'select',
           '#description' => $product_info,
           '#title' => $product_sku,
