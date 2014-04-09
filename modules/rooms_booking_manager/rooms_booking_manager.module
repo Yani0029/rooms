@@ -333,8 +333,17 @@ function rooms_booking_manager_retrieve_booking_parameters($booking_units, $book
           $booking_parameters = 0;
         }
       }
+      foreach($booking_info as $key => $value) {
+        $keys = explode('_', $key);
+        if (count($keys) == 2) {
+          if ($keys[0] == "searchProductOptions") {
+            $booking_parameters[$i]['searchProductOptions_'.$keys[1]] = $value;
+          }
+        }
+      }
     }
   }
+
 
   // If the booking parameter data was not valid or did not correspond to the number of units
   // invalidate the data
@@ -370,9 +379,17 @@ function rooms_booking_manager_present_individual_rooms($units_per_type, $conten
 
         // Add purchase forms - passing through hook_forms to handle multiple forms on the page
         $form = 'book_unit_form_' . $unit_id;
-
+        $option_products = array();
+        foreach ($booking_parameters[1] as $key => $value) {
+          $keys = explode('_', $key);
+          if (count($keys) == 2) {
+            if ($keys[0] == "searchProductOptions") {
+              $option_products['searchProductOptions_'.$keys[1]] = $value;
+            }
+          }
+        }
         $content['units_per_type'][$type][$price][$unit_id]['book_unit_form'] = drupal_get_form($form, $unit_obj, $start_date, $end_date, $booking_parameters[1]['adults'],
-                                                                                                $booking_parameters[1]['children'],$unit['state'], $unit['price']);
+                                                                                                $booking_parameters[1]['children'],$unit['state'], $unit['price'],$option_products);
 
       }
     }
@@ -424,7 +441,7 @@ function rooms_booking_manager_forms($form_id, $args) {
  *
  * The available units have already been identified by rooms_booking_manager_results_page.
  */
-function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_date, $group_size_adults, $group_size_children, $status, $price) {
+function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_date, $group_size_adults, $group_size_children, $status, $price, $option_products = array()) {
 
   $currency_setting = commerce_currency_load(commerce_default_currency());
   $currency_symbol = $currency_setting['symbol'];
@@ -727,7 +744,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   }
 
   // Yani: Add option products here.
-  $options = book_unit_with_options($start_date,$end_date,$form_state['values']);
+  $options = book_unit_with_options($start_date,$end_date,$option_products);
   if (!empty($options)) {
     foreach ($options as $key => $option) {
       $form['booking_product_options_'.$option['product_id']] = array(
@@ -805,12 +822,12 @@ function book_unit_with_options($start_date,$end_date,$values){
   // Yani: get all the selected option products.
   $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
   $query->condition('type', 'product' , '=');
-  $option_products = $query->execute()->fetchAll();
+  $result_option_products = $query->execute()->fetchAll();
 
   $options = array();
   $total_price = 0;
-  if (isset($option_products)) {
-    foreach ($option_products as $option_product) {
+  if (isset($result_option_products)) {
+    foreach ($result_option_products as $option_product) {
       $product_id = $option_product->product_id;
       $product_sku = $option_product->sku;
       $product = commerce_product_load($product_id);
@@ -819,13 +836,13 @@ function book_unit_with_options($start_date,$end_date,$values){
       $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
       $product_info = $product->title. " - " .$product_pris ;
 
-      if($values['search_product_options_' . $product_id] && isset($product->field_option_type['und'])) {
+      if(isset($values['searchProductOptions_' . $product_id]) && isset($product->field_option_type['und'])) {
         $option_type = $product->field_option_type['und'][0]['value'];
         $options[] = array(
                   'product_id' => $product_id,
                   'product_info' => $product_info,
                   'type' => $option_type,
-                  'amount' => $values['search_product_options_' . $product_id],
+                  'amount' => $values['searchProductOptions_' . $product_id],
                   'price' => $product_pris,
         );
         switch($option_type) {
@@ -833,10 +850,10 @@ function book_unit_with_options($start_date,$end_date,$values){
             $total_price = $product_pris_amount * $nights;
             break;
           case 2:
-            $total_price = $product_pris_amount * variable_get('product_options_' . $product_id) * $nights;
+            $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id] * $nights;
             break;
           case 2:
-            $total_price = $product_pris_amount * variable_get('product_options_' . $product_id);
+            $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id];
             break;
         }
         $options[]['total_price'] = commerce_currency_format($total_price,$product_pris_currency,$product,TRUE);

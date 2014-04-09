@@ -347,7 +347,7 @@ function rooms_booking_availability_search_form_submit(&$form, &$form_state) {
     if (count($keys) == 2) {
       if ($keys[0] == 'group_size_adults') $rooms_parameters['rooms_group_size' . $keys[1]] = $value;
       if ($keys[0] == 'group_size_children') $rooms_parameters['rooms_children' . $keys[1]] = $value;
-      if ($keys[0] == 'search_product_options') $rooms_parameters['search_product_options_' . $keys[1]] = $value;
+      if ($keys[0] == 'search_product_options') $rooms_parameters['searchProductOptions_' . $keys[1]] = $value;
 
     }
   }
