@@ -818,7 +818,13 @@ function rooms_booking_manager_price_change_callback(&$form, $form_state) {
  * @return array $options
  */
 function book_unit_with_options($start_date,$end_date,$values){
-  $nights = $end_date->diff($start_date)->days;
+  if (is_object($start_date) && is_object($end_date)) {
+    $nights = $end_date->diff($start_date)->days;
+  }
+  else {
+    $nights = strtotime($end_date) - strtotime($start_date);
+    $nights = $nights/60*60*60;
+  }
   // Yani: get all the selected option products.
   $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
   $query->condition('type', 'product' , '=');
@@ -884,7 +890,8 @@ function book_unit_form_submit(&$form, &$form_state) {
   $children = $form_state['values']['children'];
   $status = $form_state['values']['status'];
 
-  $nights = $end_date->diff($start_date)->days;
+  $nights = strtotime($end_date) - strtotime($start_date);
+  $nights = $nights/60*60*60;
   // This is very inefficient right now but we need to create date objects
   // reconvert them back to strings to only recreate them in the Availability Agent
   $sd = start_date_load($start_date);
