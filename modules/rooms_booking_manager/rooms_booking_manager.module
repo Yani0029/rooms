@@ -766,21 +766,28 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info']  . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info']  . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$tmp_price * $nights/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$tmp_price * $nights * $option['amount']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$tmp_price * $option['amount']/100 ."</div>",
+            '#suffix' => '</div>',
+          );
+          break;
+        case 4:
+          $form['show_product_options_'.$option['product_id']] = array(
+            '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$tmp_price/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
@@ -851,8 +858,11 @@ function book_unit_with_options($start_date,$end_date,$values){
           case 2:
             $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id] * $nights;
             break;
-          case 2:
+          case 3:
             $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id];
+            break;
+          case 4:
+            $total_price = $product_pris_amount;
             break;
         }
         $options[] = array(
