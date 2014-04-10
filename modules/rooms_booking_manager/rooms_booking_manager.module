@@ -766,7 +766,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info']  . "kr. " . $option['price']/100 . 'pr. d¿gn</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info']  . "kr. " . $option['price']/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
