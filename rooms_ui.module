@@ -104,7 +104,6 @@ function camping_price_settings() {
     }
   }
 
-
   // Form element. It's a fieldset , "tent price"
   $form['camping_settings_price'] = array(
     '#type' => 'fieldset',
@@ -205,6 +204,41 @@ function camping_price_settings() {
       '#default_value' => variable_get('camping_setting_price_' . $unit_type . '_weekend_high'),
     );
 
+  }
+
+    // Yani: add another product type for the options like electricity, dogs, cats and so on.
+  $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
+  $query->condition('type', 'product' , '=');
+  $option_products = $query->execute()->fetchAll();
+
+  if (isset($option_products)) {
+
+    foreach ($option_products as $option_product) {
+      $product_id = $option_product->product_id;
+      $product_sku = $option_product->sku;
+      $product = commerce_product_load($product_id);
+      $product_pris_amount = $product->commerce_price['und'][0]['amount'];
+      $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
+      $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
+      $product_info = $product->title. " - " .$product_pris ;
+      $pris_no = $product_pris_amount/100;
+      // Form element. It's a fieldset , "Menu link to type"
+      $form['camping_options_setting'.$product_id] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Camping tilvalg'). $product_sku,
+        '#collapsible' => TRUE,
+        '#group' => 'vertical_settings_tab',
+      );
+
+      foreach ($unit_types as $unit_type => $unit_label) {
+        $form['camping_options_setting'.$product_id]["camping_options_setting_".$unit_type."_".$product_id] = array(
+          '#type' => 'textfield',
+          '#title' => t("Tilvalg -'$product_sku' pris i typen") . $unit_label,
+          '#description' => t("Indtast heltal,f. eks. '33' i telt, '0' i hytter (El)"),
+          '#default_value' => variable_get("camping_options_setting_".$unit_type."_".$product_id, $pris_no),
+        );
+      }
+    }
   }
   return system_settings_form($form);
 }
