@@ -977,7 +977,6 @@ function book_unit_form_submit(&$form, &$form_state) {
         );
         $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
         $option_item->field_booking_days = $booking_days;
-        $option_item->quantity = $nights_1.".00";
         $line_item = commerce_cart_product_add($user->uid, $option_item, FALSE);
       }
 
@@ -1000,7 +999,6 @@ function book_unit_form_submit(&$form, &$form_state) {
   }
 
 }
-
 
 function book_units_per_type_form($form, $form_state, $units_per_type, $start_date, $end_date, $booking_parameters, $b_units, $type = '') {
 
@@ -2404,13 +2402,39 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $quantity = $quantity[0];
     if ($quantity != $nights) {
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
-      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $unit_price * ($quantity/$nights);
-      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
-      $line_item->quantity = $nights.".00";
-      $line_item->line_item_label .= "Antal - " .$quantity/$nights;
+      //$line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $unit_price * ($quantity/$nights);
+      //$line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
+      //$line_item->quantity = $nights.".00";
+      //$line_item->line_item_label .= "Antal - " .$quantity/$nights;
     }
   }
 }
+/**
+ * Alter the price in list and single product page
+ *
+ 
+function rooms_booking_manager_commerce_product_calculate_sell_price_line_item_alter($line_item){
+  if ($line_item->type == 'product'){
+    $quantity = $line_item->quantity;
+    $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
+    $quantity = explode(".",$quantity);
+    $quantity = $quantity[0];
+    $line_item->quantity = $quantity/$nights;
+  }
+}
+/**
+ * Alter the price in cart & order
+ 
+function rooms_booking_manager_commerce_cart_line_item_refresh($line_item, $order_wrapper){
+  if ($line_item->type == 'product'){
+    $quantity = $line_item->quantity;
+    $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
+    $quantity = explode(".",$quantity);
+    $quantity = $quantity[0];
+    $line_item->quantity = $quantity/$nights;
+  }
+}
+*/
 
 /**
  * Implements hook_default_rules_configuration().
