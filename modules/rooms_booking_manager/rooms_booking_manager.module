@@ -956,6 +956,10 @@ function book_unit_form_submit(&$form, &$form_state) {
                   'total_price' => commerce_currency_format($total_price,$product_pris_currency,$product,TRUE),
            );
         */
+
+      $room_unit = rooms_unit_load($unit_id);
+
+      $unit_type = rooms_unit_type_load($room_unit->type);
       $options = book_unit_with_options($start_date,$end_date,$form_state['values']);
       foreach ($options as $key =>$option) {
         $product = commerce_product_load($option['product_id']);
@@ -977,7 +981,7 @@ function book_unit_form_submit(&$form, &$form_state) {
         );
         $booking_unit_type = array(
           LANGUAGE_NONE => array(array(
-            'value' => $unit->type,
+            'value' => $unit_type,
           )),
         );
         $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
@@ -2412,11 +2416,11 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $tmp_price = variable_get("camping_options_setting_".$option_room_unit."_".$product_id);
     $tmp_price = $tmp_price * 100;
     //Get the option price from admin config form
-
+    if($tmp_price > 0) {
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $tmp_price;
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
-
+    }
   }
 }
 /**
