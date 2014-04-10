@@ -766,21 +766,21 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info']  . "kr. " . $option['price']/100 . 'pr. d¿gn</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . ': </span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $option['price']/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $option['price']/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
@@ -840,7 +840,7 @@ function book_unit_with_options($start_date,$end_date,$values){
       $product_pris_amount = $product->commerce_price['und'][0]['amount'];
       $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
       $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
-      $product_info = $product->title. " - " .$product_pris ;
+      $product_info = $product->title. " : ";
 
       if(isset($values['searchProductOptions_' . $product_id]) && $values['searchProductOptions_' . $product_id] > 0 && isset($product->field_option_type['und'])) {
         $option_type = $product->field_option_type['und'][0]['value'];
@@ -959,7 +959,7 @@ function book_unit_form_submit(&$form, &$form_state) {
 
       $room_unit = rooms_unit_load($unit_id);
 
-      $unit_type = rooms_unit_type_load($room_unit->type);
+      $unit_type = $room_unit->type;
       $options = book_unit_with_options($start_date,$end_date,$form_state['values']);
       foreach ($options as $key =>$option) {
         $product = commerce_product_load($option['product_id']);
@@ -2357,7 +2357,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
         $fourdays = $fourdays/4*100;
         // Yani: discount price is lower than calculated price (per day)
         if ($day_price >= $fourdays){
-          $full_price = number_format($fourdays * $nights,2);
+          $full_price = $fourdays * $nights;
         }
       }
       // Yani: Week price.
@@ -2373,7 +2373,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
         $oneweek = $oneweek/7*100;
         if ($day_price >= $oneweek)
-          $full_price = number_format($oneweek * $nights,2);
+          $full_price = $oneweek * $nights;
        }
       // Yani: Weekend price. Start date = friday.
       elseif ($nights == 3 && $start_date->format('w') == 5) {
@@ -2388,7 +2388,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
         $weekend = $weekend/3*100;
         if ($day_price >= $weekend)
-          $full_price = number_format($weekend * $nights,2);
+          $full_price = $weekend * $nights;
       }
     }
 
@@ -2416,11 +2416,11 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $tmp_price = variable_get("camping_options_setting_".$option_room_unit."_".$product_id);
     $tmp_price = $tmp_price * 100;
     //Get the option price from admin config form
-    if($tmp_price > 0) {
+
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $tmp_price;
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
-    }
+
   }
 }
 /**
