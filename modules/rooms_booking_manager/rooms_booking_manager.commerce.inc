@@ -125,6 +125,7 @@ function rooms_create_line_item($unit_to_book, AvailabilityAgent $agent, $bookin
       $line_item->rooms_booked_price = $commerce_price;
       $line_item->rooms_booked_bookingprice = $booking_price;
       $line_item->rooms_booking_options = $price_options;
+      $line_item->field_booking_days = $booking_days;
 
       return $line_item;
     }

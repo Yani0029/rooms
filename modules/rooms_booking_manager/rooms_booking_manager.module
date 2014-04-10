@@ -977,6 +977,7 @@ function book_unit_form_submit(&$form, &$form_state) {
         );
         $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
         $option_item->field_booking_days = $booking_days;
+        $option_item->quantity = $nights_1.".00";
         $line_item = commerce_cart_product_add($user->uid, $option_item, FALSE);
       }
 
@@ -2399,11 +2400,13 @@ function rooms_booking_manager_price_apply($line_item, $name) {
   elseif ($line_item->type == 'product'){
     $quantity = $line_item->quantity;
     $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
+    $quantity = explode(".",$quantity);
+    $quantity = $quantity[0];
     if ($quantity != $nights) {
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $unit_price * ($quantity/$nights);
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
-      $line_item->quantity = $nights;
+      $line_item->quantity = $nights.".00";
       $line_item->line_item_label .= "Antal - " .$quantity/$nights;
     }
   }
