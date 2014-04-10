@@ -104,7 +104,7 @@ function rooms_create_line_item($unit_to_book, AvailabilityAgent $agent, $bookin
 
       $price_options = array();
 
-      $line_item->line_item_label = $line_item_label. " ( ".$option_label .")";
+      $line_item->line_item_label = $line_item_label;
       $line_item->rooms_booking_children_ages = $childrens_age;
       $line_item->field_rooms_booking_nights = $booking_days;
       $line_item->rooms_booking_number_people = $group_size;

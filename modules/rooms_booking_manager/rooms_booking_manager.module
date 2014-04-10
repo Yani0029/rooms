@@ -757,25 +757,30 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       else{
         $nights_text = $nights ." ". t("days");
       }
+      $tmp_price = variable_get("camping_options_setting_".$unit->type."_".$option['product_id']);
+      $tmp_price = $tmp_price * 100;
+      if ($tmp_price != $option['price']) {
+        $option['total_price'] =  $tmp_price * $nights;
+      }
       switch ($option['type']) {
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : ' .$option['total_price'] ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . ': </span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : ' .$option['total_price'] ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . ': </span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris :' .$option['total_price'] ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$option['total_price']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
@@ -811,11 +816,6 @@ function rooms_booking_manager_price_change_callback(&$form, $form_state) {
  *
  * Check for option products
  *
- * @param $start_date
- * @param $end_date
- * @param $values form_state['values']
- * @author Yani Xu <yx@bellcom.dk>
- * @return array $options
  */
 function book_unit_with_options($start_date,$end_date,$values){
   if (is_object($start_date) && is_object($end_date)) {
@@ -860,8 +860,8 @@ function book_unit_with_options($start_date,$end_date,$values){
                   'product_info' => $product_info,
                   'type' => $option_type,
                   'amount' => $values['searchProductOptions_' . $product_id],
-                  'price' => $product_pris,
-                  'total_price' => commerce_currency_format($total_price,$product_pris_currency,$product,TRUE),
+                  'price' => $product_pris_amount,
+                  'total_price' => $total_price,
         );
       }
     }
@@ -977,7 +977,7 @@ function book_unit_form_submit(&$form, &$form_state) {
         );
         $booking_unit_type = array(
           LANGUAGE_NONE => array(array(
-            'value' => $unit['unit']->unit_id,
+            'value' => $unit->type,
           )),
         );
         $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
@@ -2407,7 +2407,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $quantity = explode(".",$quantity);
     $quantity = $quantity[0];
     $product_id = $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'];
-    $option_room_unit->field_booking_unit_type[LANGUAGE_NONE][0]['value'];
+    $option_room_unit = $line_item->field_booking_unit_type[LANGUAGE_NONE][0]['value'];
 
     $tmp_price = variable_get("camping_options_setting_".$option_room_unit."_".$product_id);
     $tmp_price = $tmp_price * 100;
