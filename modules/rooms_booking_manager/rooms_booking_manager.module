@@ -975,8 +975,14 @@ function book_unit_form_submit(&$form, &$form_state) {
             'value' => $nights_1,
           )),
         );
+        $booking_unit_type = array(
+          LANGUAGE_NONE => array(array(
+            'value' => $unit['unit']->unit_id,
+          )),
+        );
         $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
         $option_item->field_booking_days = $booking_days;
+        $option_item->field_booking_unit_type = $booking_unit_type;
         $line_item = commerce_cart_product_add($user->uid, $option_item, FALSE);
       }
 
@@ -2400,13 +2406,17 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
     $quantity = explode(".",$quantity);
     $quantity = $quantity[0];
-    if ($quantity != $nights) {
+    $product_id = $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'];
+    $option_room_unit->field_booking_unit_type[LANGUAGE_NONE][0]['value'];
+
+    $tmp_price = variable_get("camping_options_setting_".$option_room_unit."_".$product_id);
+    $tmp_price = $tmp_price * 100;
+    //Get the option price from admin config form
+
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
-      //$line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $unit_price * ($quantity/$nights);
-      //$line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
-      //$line_item->quantity = $nights.".00";
-      //$line_item->line_item_label .= "Antal - " .$quantity/$nights;
-    }
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $tmp_price;
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
+
   }
 }
 /**

@@ -225,7 +225,7 @@ function camping_price_settings() {
       // Form element. It's a fieldset , "Menu link to type"
       $form['camping_options_setting'.$product_id] = array(
         '#type' => 'fieldset',
-        '#title' => t('Camping tilvalg'). $product_sku,
+        '#title' => t('Camping tilvalg'). " ".$product_sku,
         '#collapsible' => TRUE,
         '#group' => 'vertical_settings_tab',
       );
@@ -233,7 +233,7 @@ function camping_price_settings() {
       foreach ($unit_types as $unit_type => $unit_label) {
         $form['camping_options_setting'.$product_id]["camping_options_setting_".$unit_type."_".$product_id] = array(
           '#type' => 'textfield',
-          '#title' => t("Tilvalg -'$product_sku' pris i typen") . $unit_label,
+          '#title' => t("Tilvalg -'$product_sku' pris i typen") . " - ".$unit_label,
           '#description' => t("Indtast heltal,f. eks. '33' i telt, '0' i hytter (El)"),
           '#default_value' => variable_get("camping_options_setting_".$unit_type."_".$product_id, $pris_no),
         );
