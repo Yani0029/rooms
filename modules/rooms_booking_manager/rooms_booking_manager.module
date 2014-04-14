@@ -983,6 +983,9 @@ function book_unit_form_submit(&$form, &$form_state) {
           case 3:
             $quantity = $option['amount'];
             break;
+          case 4:
+            $quantity = $option['amount'];
+            break;
         }
         $booking_days = array(
           LANGUAGE_NONE => array(array(
@@ -2430,6 +2433,9 @@ function rooms_booking_manager_price_apply($line_item, $name) {
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $tmp_price;
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
+    foreach ($line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'] as $key => $component) {
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][$key]['price']['amount'] = $tmp_price / $unit_price * $component['price']['amount'];
+    }
 
   }
 }
