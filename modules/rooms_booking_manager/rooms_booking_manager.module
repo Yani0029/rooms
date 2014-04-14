@@ -333,8 +333,17 @@ function rooms_booking_manager_retrieve_booking_parameters($booking_units, $book
           $booking_parameters = 0;
         }
       }
+      foreach($booking_info as $key => $value) {
+        $keys = explode('_', $key);
+        if (count($keys) == 2) {
+          if ($keys[0] == "searchProductOptions") {
+            $booking_parameters[$i]['searchProductOptions_'.$keys[1]] = $value;
+          }
+        }
+      }
     }
   }
+
 
   // If the booking parameter data was not valid or did not correspond to the number of units
   // invalidate the data
@@ -370,9 +379,17 @@ function rooms_booking_manager_present_individual_rooms($units_per_type, $conten
 
         // Add purchase forms - passing through hook_forms to handle multiple forms on the page
         $form = 'book_unit_form_' . $unit_id;
-
+        $option_products = array();
+        foreach ($booking_parameters[1] as $key => $value) {
+          $keys = explode('_', $key);
+          if (count($keys) == 2) {
+            if ($keys[0] == "searchProductOptions") {
+              $option_products['searchProductOptions_'.$keys[1]] = $value;
+            }
+          }
+        }
         $content['units_per_type'][$type][$price][$unit_id]['book_unit_form'] = drupal_get_form($form, $unit_obj, $start_date, $end_date, $booking_parameters[1]['adults'],
-                                                                                                $booking_parameters[1]['children'],$unit['state'], $unit['price']);
+                                                                                                $booking_parameters[1]['children'],$unit['state'], $unit['price'],$option_products);
 
       }
     }
@@ -380,7 +397,6 @@ function rooms_booking_manager_present_individual_rooms($units_per_type, $conten
 
   return $content;
 }
-
 
 /**
  * Prepares rooms on a per type basis
@@ -425,7 +441,7 @@ function rooms_booking_manager_forms($form_id, $args) {
  *
  * The available units have already been identified by rooms_booking_manager_results_page.
  */
-function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_date, $group_size_adults, $group_size_children, $status, $price) {
+function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_date, $group_size_adults, $group_size_children, $status, $price, $option_products = array()) {
 
   $currency_setting = commerce_currency_load(commerce_default_currency());
   $currency_symbol = $currency_setting['symbol'];
@@ -544,7 +560,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     '#tree' => TRUE,
   );
 
-  // Add options checkboxes
+/*  // Add options checkboxes
   if (isset($unit->rooms_booking_unit_options[LANGUAGE_NONE])) {
     // Convert Price options in Price modifiers
     $price_modifiers = array();
@@ -612,7 +628,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         }
       }
     }
-  }
+  }*/
 
   // Price is calculated as 'Price per person per night'
   if (variable_get('rooms_price_calculation', ROOMS_PER_NIGHT) == ROOMS_PER_PERSON) {
@@ -720,11 +736,63 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $new_price = $price_calendar->calculatePrice($start_date, $end_date, $unit->max_sleeps);
     }
 
-    $form['new_price'] = array(
+/*    $form['new_price'] = array(
       '#prefix' => '<div id="unit_' . $unit->unit_id . '_price" style="font-weight:bold">',
       '#markup' => t('Cost:') . ' ' . $currency_symbol . ' ' .$add_price,//$new_price['full_price'],
       '#suffix' => '</div>',
-    );
+    );*/
+  }
+
+  // Yani: Add option products here.
+  $options = book_unit_with_options($start_date,$end_date,$option_products);
+  if (!empty($options)) {
+    foreach ($options as $key => $option) {
+      $form['searchProductOptions_'.$option['product_id']] = array(
+        '#type' => 'hidden',
+        '#value' => $option['amount'],
+      );
+      if ($nights == 1) {
+        $nights_text = $nights ." ". t("day");
+      }
+      else{
+        $nights_text = $nights ." ". t("days");
+      }
+      $tmp_price = variable_get("camping_options_setting_".$unit->type."_".$option['product_id']);
+      $tmp_price = $tmp_price * 100;
+      if ($tmp_price != $option['price']) {
+        $option['total_price'] =  $tmp_price * $nights;
+      }
+      switch ($option['type']) {
+        case 1:
+          $form['show_product_options_'.$option['product_id']] = array(
+            '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
+            '#markup' => "<span>" .$option['product_info']  . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$tmp_price * $nights/100 ."</div>",
+            '#suffix' => '</div>',
+          );
+          break;
+        case 2:
+          $form['show_product_options_'.$option['product_id']] = array(
+            '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$tmp_price * $nights * $option['amount']/100 ."</div>",
+            '#suffix' => '</div>',
+          );
+          break;
+        case 3:
+          $form['show_product_options_'.$option['product_id']] = array(
+            '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$tmp_price * $option['amount']/100 ."</div>",
+            '#suffix' => '</div>',
+          );
+          break;
+        case 4:
+          $form['show_product_options_'.$option['product_id']] = array(
+            '#prefix' => '<br /><div id="option_product_' . $option['product_id'] . '">',
+            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$tmp_price/100 ."</div>",
+            '#suffix' => '</div>',
+          );
+          break;
+      }
+    }
   }
 
   // We add the form's #submit array to this button along with the actual submit
@@ -747,11 +815,69 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   return $form;
 }
 
-
 function rooms_booking_manager_price_change_callback(&$form, $form_state) {
   return $form['price'];
 }
 
+/**
+ *
+ * Check for option products
+ *
+ */
+function book_unit_with_options($start_date,$end_date,$values){
+  if (is_object($start_date) && is_object($end_date)) {
+    $nights = $end_date->diff($start_date)->days;
+  }
+  else {
+    $nights = strtotime($end_date) - strtotime($start_date);
+    $nights = floor($nights/(60*60*24));
+  }
+  // Yani: get all the selected option products.
+  $query= db_select('commerce_product', 'c')->fields('c', array('product_id', 'sku'));
+  $query->condition('type', 'product' , '=');
+  $result_option_products = $query->execute()->fetchAll();
+
+  $options = array();
+  $total_price = 0;
+  if (isset($result_option_products)) {
+    foreach ($result_option_products as $option_product) {
+      $product_id = $option_product->product_id;
+      $product_sku = $option_product->sku;
+      $product = commerce_product_load($product_id);
+      $product_pris_amount = $product->commerce_price['und'][0]['amount'];
+      $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
+      $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
+      $product_info = $product->title. " : ";
+
+      if(isset($values['searchProductOptions_' . $product_id]) && $values['searchProductOptions_' . $product_id] > 0 && isset($product->field_option_type['und'])) {
+        $option_type = $product->field_option_type['und'][0]['value'];
+        switch($option_type) {
+          case 1:
+            $total_price = $product_pris_amount * $nights;
+            break;
+          case 2:
+            $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id] * $nights;
+            break;
+          case 3:
+            $total_price = $product_pris_amount * $values['searchProductOptions_' . $product_id];
+            break;
+          case 4:
+            $total_price = $product_pris_amount;
+            break;
+        }
+        $options[] = array(
+                  'product_id' => $product_id,
+                  'product_info' => $product_info,
+                  'type' => $option_type,
+                  'amount' => $values['searchProductOptions_' . $product_id],
+                  'price' => $product_pris_amount,
+                  'total_price' => $total_price,
+        );
+      }
+    }
+  }
+  return $options;
+}
 
 /**
  * Validation for cart booking form
@@ -760,7 +886,6 @@ function rooms_booking_manager_price_change_callback(&$form, $form_state) {
  */
 function book_unit_form_validate(&$form, &$form_state) {
 }
-
 
 function book_unit_form_submit(&$form, &$form_state) {
 
@@ -775,6 +900,8 @@ function book_unit_form_submit(&$form, &$form_state) {
   $children = $form_state['values']['children'];
   $status = $form_state['values']['status'];
 
+  $nights_1 = strtotime($end_date) - strtotime($start_date);
+  $nights_1 = floor($nights_1/(60*60*24));
   // This is very inefficient right now but we need to create date objects
   // reconvert them back to strings to only recreate them in the Availability Agent
   $sd = start_date_load($start_date);
@@ -794,7 +921,7 @@ function book_unit_form_submit(&$form, &$form_state) {
       $unit = array_pop($available_units);
 
       $price_modifiers = array();
-      if (isset($form_state['values']['options'])) {
+/*      if (isset($form_state['values']['options'])) {
         // Convert Price options in Price modifiers
         if (isset($unit['unit']->rooms_booking_unit_options[LANGUAGE_NONE])) {
           foreach ($unit['unit']->rooms_booking_unit_options[LANGUAGE_NONE] as $option) {
@@ -822,15 +949,61 @@ function book_unit_form_submit(&$form, &$form_state) {
           }
         }
       }
-
+*/
       // Create line item
       $line_item = rooms_create_line_item($unit, $agent, array('adults' => $group_size, 'children' => $children), $price_modifiers);
-
       // Add line item to cart
       $line_item = commerce_cart_product_add($user->uid, $line_item, FALSE);
 
-      // Send user to cart
+      // Yani : Create option line item
+      /**
+        * $options[] = array(
+                  'product_id' => $product_id,
+                  'product_info' => $product_info,
+                  'type' => $option_type,
+                  'amount' => $values['searchProductOptions_' . $product_id],
+                  'price' => $product_pris,
+                  'total_price' => commerce_currency_format($total_price,$product_pris_currency,$product,TRUE),
+           );
+        */
 
+      $room_unit = rooms_unit_load($unit_id);
+
+      $unit_type = $room_unit->type;
+      $options = book_unit_with_options($start_date,$end_date,$form_state['values']);
+      foreach ($options as $key =>$option) {
+        $product = commerce_product_load($option['product_id']);
+        switch($option['type']) {
+          case 1:
+            $quantity = $nights_1;
+            break;
+          case 2:
+            $quantity = $option['amount'] * $nights_1;
+            break;
+          case 3:
+            $quantity = $option['amount'];
+            break;
+          case 4:
+            $quantity = $option['amount'];
+            break;
+        }
+        $booking_days = array(
+          LANGUAGE_NONE => array(array(
+            'value' => $nights_1,
+          )),
+        );
+        $booking_unit_type = array(
+          LANGUAGE_NONE => array(array(
+            'value' => $unit_type,
+          )),
+        );
+        $option_item = commerce_product_line_item_new($product, $quantity, 0, array(),'product');
+        $option_item->field_booking_days = $booking_days;
+        $option_item->field_booking_unit_type = $booking_unit_type;
+        $line_item = commerce_cart_product_add($user->uid, $option_item, FALSE);
+      }
+
+      // Send user to cart
       drupal_goto('bookings');
 
     }
@@ -849,7 +1022,6 @@ function book_unit_form_submit(&$form, &$form_state) {
   }
 
 }
-
 
 function book_units_per_type_form($form, $form_state, $units_per_type, $start_date, $end_date, $booking_parameters, $b_units, $type = '') {
 
@@ -2198,7 +2370,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
         $fourdays = $fourdays/4*100;
         // Yani: discount price is lower than calculated price (per day)
         if ($day_price >= $fourdays){
-          $full_price = number_format($fourdays * $nights,2);
+          $full_price = $fourdays * $nights;
         }
       }
       // Yani: Week price.
@@ -2214,7 +2386,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
         $oneweek = $oneweek/7*100;
         if ($day_price >= $oneweek)
-          $full_price = number_format($oneweek * $nights,2);
+          $full_price = $oneweek * $nights;
        }
       // Yani: Weekend price. Start date = friday.
       elseif ($nights == 3 && $start_date->format('w') == 5) {
@@ -2229,7 +2401,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
         $weekend = $weekend/3*100;
         if ($day_price >= $weekend)
-          $full_price = number_format($weekend * $nights,2);
+          $full_price = $weekend * $nights;
       }
     }
 
@@ -2246,8 +2418,53 @@ function rooms_booking_manager_price_apply($line_item, $name) {
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][$key]['price']['amount'] = $full_price / $amount * $component['price']['amount'];
     }
   }
-}
+  elseif ($line_item->type == 'product'){
+    $quantity = $line_item->quantity;
+    $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
+    $quantity = explode(".",$quantity);
+    $quantity = $quantity[0];
+    $product_id = $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'];
+    $option_room_unit = $line_item->field_booking_unit_type[LANGUAGE_NONE][0]['value'];
 
+    $tmp_price = variable_get("camping_options_setting_".$option_room_unit."_".$product_id);
+    $tmp_price = $tmp_price * 100;
+    //Get the option price from admin config form
+
+      $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $tmp_price;
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
+    foreach ($line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'] as $key => $component) {
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][$key]['price']['amount'] = $tmp_price / $unit_price * $component['price']['amount'];
+    }
+
+  }
+}
+/**
+ * Alter the price in list and single product page
+ *
+ 
+function rooms_booking_manager_commerce_product_calculate_sell_price_line_item_alter($line_item){
+  if ($line_item->type == 'product'){
+    $quantity = $line_item->quantity;
+    $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
+    $quantity = explode(".",$quantity);
+    $quantity = $quantity[0];
+    $line_item->quantity = $quantity/$nights;
+  }
+}
+/**
+ * Alter the price in cart & order
+ 
+function rooms_booking_manager_commerce_cart_line_item_refresh($line_item, $order_wrapper){
+  if ($line_item->type == 'product'){
+    $quantity = $line_item->quantity;
+    $nights = $line_item->field_booking_days[LANGUAGE_NONE][0]['value'];
+    $quantity = explode(".",$quantity);
+    $quantity = $quantity[0];
+    $line_item->quantity = $quantity/$nights;
+  }
+}
+*/
 
 /**
  * Implements hook_default_rules_configuration().

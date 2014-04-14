@@ -103,19 +103,8 @@ function rooms_create_line_item($unit_to_book, AvailabilityAgent $agent, $bookin
       }
 
       $price_options = array();
-      $option_label = "";
-      foreach ($price_modifiers as $mod) {
-        $price_options[LANGUAGE_NONE][] = array(
-          'name' => $mod['#name'],
-          // Yani: fix quantity.
-          'quantity' => $mod['#quantity'], 
-          'operation' => $mod['#op_type'],
-          'value' => $mod['#amount'],
-        );
-         // Yani: add option to label.
-         $option_label = $option_label . " -- ". t($mod['#name']) . " : " . $mod['#quantity'];
-      }
-      $line_item->line_item_label = $line_item_label. " ( ".$option_label .")";
+
+      $line_item->line_item_label = $line_item_label;
       $line_item->rooms_booking_children_ages = $childrens_age;
       $line_item->field_rooms_booking_nights = $booking_days;
       $line_item->rooms_booking_number_people = $group_size;
@@ -125,6 +114,7 @@ function rooms_create_line_item($unit_to_book, AvailabilityAgent $agent, $bookin
       $line_item->rooms_booked_price = $commerce_price;
       $line_item->rooms_booked_bookingprice = $booking_price;
       $line_item->rooms_booking_options = $price_options;
+      $line_item->field_booking_days = $booking_days;
 
       return $line_item;
     }
