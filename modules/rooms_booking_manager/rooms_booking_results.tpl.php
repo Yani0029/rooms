@@ -20,7 +20,7 @@
           // Yani: add div outside side item. 
           print "<div class='booking-result room-result" . $unit_id ."'>
           <div class='result-div'>";
-          
+
           print render($unit['unit']);
           print render($unit['price']);
           print render($unit['book_unit_form']);
