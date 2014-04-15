@@ -225,14 +225,16 @@ function rooms_booking_availability_search_form($form, $form_state) {
       $product_sku = $option_product->sku;
       $product = commerce_product_load($product_id);
       $product_pris_amount = $product->commerce_price['und'][0]['amount'];
-      $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
-      $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
-      $product_info = $product->title. " - " .$product_pris ;
+      $product_pris_currency = "DKK";
+      $product_pris = $product_pris_amount/100;
+      //$product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
+      $product_info = $product->title. " - " ."<span class='notranslate'>DKK </span>".$product_pris ;
 
       // option type 1 for electricity, checkbox
       if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
         if ($product_sku == 'El') {
-          $product_info .= "(0 kr. i hytter)";
+          $tmp_price = variable_get("camping_options_setting_hytter_".$product_id);
+          $product_info .= "(DKK $tmp_price in cabins)";
         }
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#title' => $product_sku,
@@ -246,7 +248,8 @@ function rooms_booking_availability_search_form($form, $form_state) {
       // option type 2 for dogs, select
       elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
         if ($product_sku == 'Hund') {
-          $product_info .= " (50.00 kr. i hytter)";
+          $tmp_price = variable_get("camping_options_setting_hytter_".$product_id);
+          $product_info .= "(DKK $tmp_price in cabins)";
         }
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#type' => 'select',

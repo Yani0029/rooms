@@ -552,7 +552,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
 
   $form['price'] = array(
     '#prefix' => '<div class="unit_price" id="' . $unit->unit_id . '_price" style="font-weight:bold">',
-    '#markup' =>  t('Base Cost:') . ' ' . $currency_symbol . ' ' . $price,
+    '#markup' =>  t('Base Cost:') . ' ' . "DKK" . ' ' . $price,
     '#suffix' => '</div>'
   );
 
@@ -766,28 +766,28 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         case 1:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info']  . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : kr. ' .$tmp_price * $nights/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info']  . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ' Total pris : DKK ' .$tmp_price * $nights/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 2:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : kr. ' .$tmp_price * $nights * $option['amount']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' Total pris : DKK ' .$tmp_price * $nights * $option['amount']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 3:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$tmp_price * $option['amount']/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : DKK ' .$tmp_price * $option['amount']/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
         case 4:
           $form['show_product_options_'.$option['product_id']] = array(
             '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "kr. " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : kr. ' .$tmp_price/100 ."</div>",
+            '#markup' => "<span>" .$option['product_info'] . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold; text-align: right">' .t('Antal') . " - " . $option['amount'] . ' Total pris : DKK ' .$tmp_price/100 ."</div>",
             '#suffix' => '</div>',
           );
           break;
@@ -845,7 +845,7 @@ function book_unit_with_options($start_date,$end_date,$values){
       $product_sku = $option_product->sku;
       $product = commerce_product_load($product_id);
       $product_pris_amount = $product->commerce_price['und'][0]['amount'];
-      $product_pris_currency = $product->commerce_price['und'][0]['currency_code'];
+      $product_pris_currency = "DKK";
       $product_pris = commerce_currency_format($product_pris_amount,$product_pris_currency,$product,TRUE);
       $product_info = $product->title. " : ";
 
@@ -2412,7 +2412,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
     // Yani: end of price calculation showing in booking /cart table.
     $full_price += $option_price;
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $full_price;
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = "DKK";
 
     foreach ($line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'] as $key => $component) {
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][$key]['price']['amount'] = $full_price / $amount * $component['price']['amount'];
@@ -2432,7 +2432,7 @@ function rooms_booking_manager_price_apply($line_item, $name) {
 
       $unit_price = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $tmp_price;
-      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = commerce_default_currency();
+      $line_item->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] = "DKK";
     foreach ($line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'] as $key => $component) {
       $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][$key]['price']['amount'] = $tmp_price / $unit_price * $component['price']['amount'];
     }
