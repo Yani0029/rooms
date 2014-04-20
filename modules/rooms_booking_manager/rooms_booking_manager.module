@@ -504,7 +504,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $fourdays = $fourdays/4;
       // Yani: discount price is lower than calculated price (per day)
       if ($day_price >= $fourdays){
-        $price = number_format($fourdays * $nights,2);
+        $price = $fourdays * $nights;
       }
     }
     // Yani: Week price.
@@ -522,7 +522,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       }
       $oneweek = $oneweek/7;
       if ($day_price >= $oneweek)
-        $price = number_format($oneweek * $nights,2);
+        $price = $oneweek * $nights;
      }
     // Yani: Weekend price. Start date = friday.
     elseif ($nights == 3 && $start_date->format('w') == 5) {
@@ -539,22 +539,22 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       }
       $weekend = $weekend/3;
       if ($day_price >= $weekend)
-        $price = number_format($weekend * $nights,2);
+        $price = $weekend * $nights;
     }
   }
-
+  $group_size_children_1 = $group_size_children;
   // Yani: Adults and children price for other types.
   if ($include_price_per_person) {
     $price = $price + $adults_price * $group_size_adults * $nights + $children_price * $group_size_children * $nights;
   }
 
   // Yani: End of price calculation for showing in the search resultes.
-
+  /*
   $form['price'] = array(
     '#prefix' => '<div class="unit_price" id="' . $unit->unit_id . '_price" style="font-weight:bold">',
     '#markup' =>  t('Base Cost:') . ' ' . "DKK" . ' ' . $price,
     '#suffix' => '</div>'
-  );
+  );*/
 
   // Price is calculated as 'Price per person per night'
   if (variable_get('rooms_price_calculation', ROOMS_PER_NIGHT) == ROOMS_PER_PERSON) {
@@ -664,17 +664,17 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   }
   $form['section_products'] = array(
       '#type' => 'markup',
-      '#prefix' => '<table>',
+      '#prefix' => '<br/><table>',
       '#suffix' => '</table>',
   );
   $form['section_products']['section_header'] = array(
       '#prefix' => '<tr>',
-      '#markup' => '<th>'.t('Booking') . '</th><th>'.t("Day(s)") .'</th><th>'.t("Amount") .'</th><th style="font-weight:bold;">'.t('Pris i') .' DKK </th>',
+      '#markup' => '<th>'.t('Booking') . '</th><th>'.t("Dag(e)") .'</th><th>'.t("Antal") .'</th><th style="font-weight:bold;">'.t('Pris i') .' DKK </th>',
       '#suffix' => '</tr>',
   );
   $form['section_products']['section_main_product'] = array(
       '#prefix' => '<tr>',
-      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children . " " . t('Children') . '</td><td>' . $nights . '</td><td>1</td><td style="font-weight:bold;">' . $price .'</td>',
+      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children_1 . " " . t('Children') . '</td><td>' . $nights . '</td><td>1</td><td style="font-weight:bold;text-align: right;">' . $price .'</td>',
       '#suffix' => '</tr>',
   );
 
@@ -709,7 +709,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
             '#markup' => '<td>' .$option['product_sku']  . '</td>
                           <td>' . $nights . '</td>
                           <td>' . $option['amount'] . '</td>
-                          <td style="font-weight:bold;">'.$option_price ."</td>",
+                          <td style="font-weight:bold;text-align: right;">'.$option_price ."</td>",
             '#suffix' => '</tr>',
       );
       $total_new_price += $option_price;
@@ -720,7 +720,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
             '#markup' => '<td>' .t('I alt') . '</td>
                           <td>' . $nights . '</td>
                           <td></td>
-                          <td style="font-weight:bold;">'.$total_new_price ."</td>",
+                          <td style="font-weight:bold;text-align: right;">'.$total_new_price ."</td>",
             '#suffix' => '</tr>',
   );
   // We add the form's #submit array to this button along with the actual submit
