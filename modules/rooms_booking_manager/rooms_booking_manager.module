@@ -556,80 +556,6 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     '#suffix' => '</div>'
   );
 
-  $form['options'] = array(
-    '#tree' => TRUE,
-  );
-
-/*  // Add options checkboxes
-  if (isset($unit->rooms_booking_unit_options[LANGUAGE_NONE])) {
-    // Convert Price options in Price modifiers
-    $price_modifiers = array();
-    $add_price = 0;
-
-    foreach ($unit->rooms_booking_unit_options[LANGUAGE_NONE] as $option) {
-     // print_r($option);
-      $form['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
-        '#type' => 'checkbox',
-        '#title' => $option['name'],
-        '#ajax' => array(
-          'callback' => 'rooms_booking_manager_options_change_callback',
-          'wrapper' => 'unit_' . $unit->unit_id . '_price',
-        ),
-      );
-
-      // Show quantity field selector if in option quantity is setted
-      if (is_numeric($option['quantity'])) {
-        if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))])) {
-          if ($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1 && $option['quantity'] > 1) {
-
-            $form['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'] = array(
-              '#type' => 'select',
-              '#title' => t('Quantity'),
-              '#options' => range(1, $option['quantity']),
-              '#ajax' => array(
-                'callback' => 'rooms_booking_manager_options_change_callback',
-                'wrapper' => 'unit_' . $unit->unit_id . '_price',
-              ),
-              '#prefix' => '<div id="unit_' . $unit->unit_id . '_' . strtolower(str_replace(array(':', ' '), '_', $option['name'])) . '_quantity">',
-              '#suffix' => '</div>',
-            );
-          }
-          else {
-            $form['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'] = array(
-              '#prefix' => '<div id="unit_' . $unit->unit_id . '_' . strtolower(str_replace(array(':', ' '), '_', $option['name'])) . '_quantity">',
-              '#suffix' => '</div>',
-            );
-          }
-        }
-        else {
-          $form['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'] = array(
-            '#prefix' => '<div id="' . 'unit_' . $unit->unit_id . '_' . strtolower(str_replace(array(':', ' '), '_', $option['name'])) . '_quantity">',
-            '#suffix' => '</div>',
-          );
-        }
-      }
-
-      if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))])) {
-        $quantity = 1;
-        if (isset($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity']) && $operation_list[$option['operation']] != ROOMS_REPLACE) {
-          $quantity = $form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'] + 1;
-        }
-
-        if ($form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name']))] == 1) {
-          // Yani: debug option price.
-       //   $quantity = $form_state['values']['options'][strtolower(str_replace(array(':', ' '), '_', $option['name'])) . ':quantity'];
-          $price_modifiers[strtolower(str_replace(array(':', ' '), '_', $option['name']))] = array(
-            '#type' => ROOMS_DYNAMIC_MODIFIER,
-            '#op_type' => $option['operation'],
-            '#amount' => $option['value'] * $quantity,
-            '#quantity' =>$quantity,
-          );
-          $add_price = $add_price +  $option['value'] * $quantity;
-        }
-      }
-    }
-  }*/
-
   // Price is calculated as 'Price per person per night'
   if (variable_get('rooms_price_calculation', ROOMS_PER_NIGHT) == ROOMS_PER_PERSON) {
     $form['persons'] = array(
@@ -735,14 +661,24 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
     else {
       $new_price = $price_calendar->calculatePrice($start_date, $end_date, $unit->max_sleeps);
     }
-
-/*    $form['new_price'] = array(
-      '#prefix' => '<div id="unit_' . $unit->unit_id . '_price" style="font-weight:bold">',
-      '#markup' => t('Cost:') . ' ' . $currency_symbol . ' ' .$add_price,//$new_price['full_price'],
-      '#suffix' => '</div>',
-    );*/
   }
+  $form['section_products'] = array(
+      '#type' => 'markup',
+      '#prefix' => '<table>',
+      '#suffix' => '</table>',
+  );
+  $form['section_products']['section_header'] = array(
+      '#prefix' => '<tr>',
+      '#markup' => '<th>'.t('Booking') . '</th><th>'.t("Day(s)") .'</th><th>'.t("Amount") .'</th><th style="font-weight:bold;">'.t('Pris i') .' DKK </th>',
+      '#suffix' => '</tr>',
+  );
+  $form['section_products']['section_main_product'] = array(
+      '#prefix' => '<tr>',
+      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children . " " . t('Children') . '</td><td>' . $nights . '</td><td>1</td><td style="font-weight:bold;">' . $price .'</td>',
+      '#suffix' => '</tr>',
+  );
 
+  $total_new_price = $price;
   // Yani: Add option products here.
   $options = book_unit_with_options($start_date,$end_date,$option_products);
   if (!empty($options)) {
@@ -751,50 +687,42 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
         '#type' => 'hidden',
         '#value' => $option['amount'],
       );
-      if ($nights == 1) {
-        $nights_text = $nights ." ". t("day");
-      }
-      else{
-        $nights_text = $nights ." ". t("days");
-      }
+
       $tmp_price = variable_get("camping_options_setting_".$unit->type."_".$option['product_id']);
-      $tmp_price = $tmp_price * 100;
-      if ($tmp_price != $option['price']) {
-        $option['total_price'] =  $tmp_price * $nights;
-      }
+
       switch ($option['type']) {
         case 1:
-          $form['show_product_options_'.$option['product_id']] = array(
-            '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info']  . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold;">' . $nights_text . ' pris : DKK ' .$tmp_price * $nights/100 ."</div>",
-            '#suffix' => '</div>',
-          );
+            $option_price = $tmp_price * $nights;
           break;
         case 2:
-          $form['show_product_options_'.$option['product_id']] = array(
-            '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold;">' . $nights_text . ", ".t('Antal') ." - ". $option['amount'] . ' pris : DKK ' .$tmp_price * $nights * $option['amount']/100 ."</div>",
-            '#suffix' => '</div>',
-          );
+            $option_price = $tmp_price * $nights * $option['amount'];
           break;
         case 3:
-          $form['show_product_options_'.$option['product_id']] = array(
-            '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold;">' .t('Antal') . " - " . $option['amount'] . ' pris : DKK ' .$tmp_price * $option['amount']/100 ."</div>",
-            '#suffix' => '</div>',
-          );
+            $option_price = $tmp_price * $option['amount'];
           break;
         case 4:
-          $form['show_product_options_'.$option['product_id']] = array(
-            '#prefix' => '<div id="option_product_' . $option['product_id'] . '">',
-            '#markup' => "<span>" .$option['product_info'] . "DKK " . $tmp_price/100 . '</span><div style="font-weight:bold;">' .t('Antal') . " - " . $option['amount'] . ' pris : DKK ' .$tmp_price/100 ."</div>",
-            '#suffix' => '</div>',
-          );
+            $option_price = $tmp_price;
           break;
       }
+      $form['section_products']['section_options_'.$option['product_id']] = array(
+            '#prefix' => '<tr>',
+            '#markup' => '<td>' .$option['product_sku']  . '</td>
+                          <td>' . $nights . '</td>
+                          <td>' . $option['amount'] . '</td>
+                          <td style="font-weight:bold;">'.$option_price ."</td>",
+            '#suffix' => '</tr>',
+      );
+      $total_new_price += $option_price;
     }
   }
-
+  $form['section_products']['section_total'] = array(
+            '#prefix' => '<tr>',
+            '#markup' => '<td>' .t('I alt') . '</td>
+                          <td>' . $nights . '</td>
+                          <td></td>
+                          <td style="font-weight:bold;">'.$total_new_price ."</td>",
+            '#suffix' => '</tr>',
+  );
   // We add the form's #submit array to this button along with the actual submit
   // handler to preserve any submit handlers added by a form callback_wrapper.
   $submit = array();
