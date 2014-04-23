@@ -127,7 +127,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
   elseif (variable_get('rooms_presentation_style', ROOMS_PER_TYPE) == ROOMS_INDIVIDUAL) {
     $form['rooms_fieldset']['group_size_adults:1'] = array(
       '#type' => 'select',
-      '#title' => t('Adults'),
+      '#title' => t('Voksne'),
       '#options' => array(
         '1' => '1',
         '2' => '2',
@@ -234,7 +234,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
       if (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 1) {
         if ($product_sku == 'El') {
           $tmp_price = variable_get("camping_options_setting_hytter_".$product_id);
-          $product_info .= "(DKK $tmp_price in cabins)";
+          $product_info .= "(DKK $tmp_price ".t('i hytte') . ")";
         }
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#title' => $product_sku,
@@ -249,7 +249,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
       elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 2) {
         if ($product_sku == 'Hund') {
           $tmp_price = variable_get("camping_options_setting_hytter_".$product_id);
-          $product_info .= "(DKK $tmp_price in cabins)";
+          $product_info .= "(DKK $tmp_price ".t('i hytte') .")";
         }
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#type' => 'select',
