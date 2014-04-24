@@ -669,12 +669,12 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   );
   $form['section_products']['section_header'] = array(
       '#prefix' => '<tr>',
-      '#markup' => '<th>'.t('Booking') . '</th><th>'.t("Dag(e)") .'</th><th>'.t("Antal") .'</th><th style="font-weight:bold;">'.t('Pris i') .' DKK </th>',
+      '#markup' => '<th>'.t('Booking') . '</th><th>'.t("Antal") .'</th><th>'.t("Nætter") .'</th><th style="font-weight:bold;">'.t('Pris i') .' DKK </th>',
       '#suffix' => '</tr>',
   );
   $form['section_products']['section_main_product'] = array(
       '#prefix' => '<tr>',
-      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children_1 . " " . t('Children') . '</td><td>' . $nights . '</td><td>1</td><td style="font-weight:bold;text-align: right;">' . $price .'</td>',
+      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children_1 . " " . t('Children') . '</td><td>1</td><td>' . $nights . '</td><td style="font-weight:bold;text-align: right;">' . $price .'</td>',
       '#suffix' => '</tr>',
   );
 
@@ -707,8 +707,8 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $form['section_products']['section_options_'.$option['product_id']] = array(
             '#prefix' => '<tr>',
             '#markup' => '<td>' .$option['product_sku']  . '</td>
-                          <td>' . $nights . '</td>
                           <td>' . $option['amount'] . '</td>
+                          <td>' . $nights . '</td>
                           <td style="font-weight:bold;text-align: right;">'.$option_price ."</td>",
             '#suffix' => '</tr>',
       );
@@ -718,8 +718,8 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   $form['section_products']['section_total'] = array(
             '#prefix' => '<tr>',
             '#markup' => '<td>' .t('I alt') . '</td>
-                          <td>' . $nights . '</td>
                           <td></td>
+                          <td>' . $nights . '</td>
                           <td style="font-weight:bold;text-align: right;">'.$total_new_price ."</td>",
             '#suffix' => '</tr>',
   );
