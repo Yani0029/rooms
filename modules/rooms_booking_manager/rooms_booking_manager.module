@@ -547,7 +547,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   if ($include_price_per_person) {
     $price = $price + $adults_price * $group_size_adults * $nights + $children_price * $group_size_children * $nights;
   }
-
+  $price_format_1 = number_format($price, 2, ',', '');
   // Yani: End of price calculation for showing in the search resultes.
   /*
   $form['price'] = array(
@@ -674,7 +674,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
   );
   $form['section_products']['section_main_product'] = array(
       '#prefix' => '<tr>',
-      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children_1 . " " . t('Children') . '</td><td>1</td><td>' . $nights . '</td><td style="font-weight:bold;text-align: right;">' . $price .'</td>',
+      '#markup' => '<td>' . $group_size_adults . " " . t('Adults') . ' ' .$group_size_children_1 . " " . t('Children') . '</td><td></td><td>' . $nights . '</td><td style="font-weight:bold;text-align: right;">' . $price_format_1 .'</td>',
       '#suffix' => '</tr>',
   );
 
@@ -715,6 +715,7 @@ function book_unit_form_builder($form_id, $form_state, $unit, $start_date, $end_
       $total_new_price += $option_price;
     }
   }
+  $total_new_price = number_format($total_new_price, 2, ',', '');
   $form['section_products']['section_total'] = array(
             '#prefix' => '<tr>',
             '#markup' => '<td>' .t('I alt') . '</td>
