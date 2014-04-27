@@ -197,6 +197,9 @@ function rooms_booking_edit_form($form, &$form_state, $booking) {
     // The Client value needs the id as well (to take us back to the Customer Profile in Commerce)
     $client = $booking->name . ':' . $booking->customer_id;
   }
+  if (isset($_GET['client'])) {
+    $client = $_GET['client'];
+  }
 
   $form['client'] = array(
     '#type' => 'textfield',
