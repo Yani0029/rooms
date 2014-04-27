@@ -214,7 +214,7 @@ function rooms_booking_edit_form($form, &$form_state, $booking) {
     ctools_include('modal');
     ctools_modal_add_js();
  
-    $form['client']['#description'] = t('Customer profiles are saved in the <a target="_blank" href="@store-profile">store</a>. Search for an existing one by typing the customer name or <a href="@profile-create" class="ctools-use-modal">create a new profile</a>.', array('@store-profile' => url('admin/commerce/customer-profiles'), '@profile-create' => url('admin/rooms/add_customers')));
+    $form['client']['#description'] = t('Customer profiles are saved in the <a class="overlay-exclude" target="_blank" href="@store-profile">store</a>. Search for an existing one by typing the customer name or <a href="@profile-create" class="ctools-use-modal">create a new profile</a>.', array('@store-profile' => url('admin/commerce/customer-profiles'), '@profile-create' => url('admin/rooms/add_customers')));
   }
 
   $form['data']['#tree'] = TRUE;
