@@ -144,7 +144,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
     if (variable_get('rooms_display_children', ROOMS_DISPLAY_CHILDREN_NO) == ROOMS_DISPLAY_CHILDREN) {
       $form['rooms_fieldset']['group_size_children:1'] = array(
         '#type' => 'select',
-        '#title' => t('Children'),
+        '#title' => t('Children') . " (t/m " .variable_get('children_age',16) . " " .t('years').")",
         '#options' => array(
           '0' => '0',
           '1' => '1',
@@ -239,7 +239,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#title' => $product_sku,
           '#type' => 'checkbox',
-          '#description' => $product_info,
+         // '#description' => $product_info,
           '#default_value' =>  '0',
           '#prefix' => '<td>',
           '#suffix' => '</td>',
@@ -253,7 +253,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
         }
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#type' => 'select',
-          '#description' => $product_info,
+          //'#description' => $product_info,
           '#title' => $product_sku,
           '#options' => array(
             '0' => '0',
@@ -274,7 +274,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
       elseif (isset($product->field_option_type['und']) && $product->field_option_type['und'][0]['value'] == 3) {
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#type' => 'select',
-          '#description' => $product_info,
+         // '#description' => $product_info,
           '#title' => $product_sku,
           '#options' => array(
             '0' => '0',
@@ -296,7 +296,7 @@ function rooms_booking_availability_search_form($form, $form_state) {
         $form['rooms_fieldset']['search_product_options:' . $product_id] = array(
           '#title' => $product_sku,
           '#type' => 'checkbox',
-          '#description' => $product_info,
+          //'#description' => $product_info,
           '#default_value' =>  '0',
           '#prefix' => '<td>',
           '#suffix' => '</td>',
