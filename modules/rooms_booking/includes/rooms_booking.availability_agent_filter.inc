@@ -223,14 +223,12 @@ class AvailabilityAgentCommerceFilter extends AvailabilityAgentCommonFilter {
 
             // Current line_item start_date and end_date values
             $s_date = new DateTime($line_item_values->rooms_booking_dates[LANGUAGE_NONE][0]['value']);
-            $e_date = new DateTime($line_item_values->rooms_booking_dates[LANGUAGE_NONE][0]['value2']);
-
+            //$e_date = new DateTime($line_item_values->rooms_booking_dates[LANGUAGE_NONE][0]['value2']);
 
             // Yani: Fix the e_date should be -1 day, it is the checkout day.
-            $date_tmp = strtotime($e_date->date);
+            $date_tmp = strtotime($line_item_values->rooms_booking_dates[LANGUAGE_NONE][0]['value2']);
             $date_tmp -= 24 * 60 * 60;
             $e_date = new DateTime(date('Y-m-d H:i:s', $date_tmp));
-
 
             // If current line_item date interval overlap parameters interval remove unit from results
             if ( $this->check_in_range($s_date, $e_date, $start_date, $end_date) ) {
